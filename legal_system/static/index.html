@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IronGryph | Legal & Investigation Evidence Vault</title>
+    <!-- Google Fonts: Plus Jakarta Sans, Space Grotesk, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Floating Navigation Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="vault-logo" onclick="switchView('dashboard')">
+                    <div class="logo-shield">
+                        <svg width="22" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" fill="url(#shield-grad)" stroke="#10B981" stroke-width="1.5"/>
+                            <path d="M9 12L11 14L15 10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="shield-grad" x1="12" y1="2" x2="12" y2="23" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#059669" stop-opacity="0.8"/>
+                                    <stop stop-color="#064E3B" stop-opacity="0.95"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">IRONGRYPH</span>
+                        <span class="logo-tag">EVIDENCE VAULT</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="nav-pills">
+                    <button class="nav-pill active" data-view="dashboard" id="nav-dashboard">
+                        <svg class="pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Cases</span>
+                        <span class="pill-badge" id="nav-case-count">4</span>
+                    </button>
+                    <button class="nav-pill" data-view="vault" id="nav-vault" style="display: none;">
+                        <svg class="pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span id="nav-vault-label">Active Case</span>
+                    </button>
+                    <button class="nav-pill" data-view="audit" id="nav-audit">
+                        <svg class="pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <span>Audit Ledger</span>
+                        <span class="role-req-badge">ADMIN</span>
+                    </button>
+                    <button class="nav-pill" data-view="tamper-lab" id="nav-tamper-lab">
+                        <svg class="pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span>Tamper Lab</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Header Right: Instant Role Switcher (NO LOGIN REQUIRED) -->
+            <div class="header-right">
+                <div class="role-switcher-card">
+                    <span class="role-toggle-label">ACTIVE PERSONA:</span>
+                    <div class="role-toggle-buttons">
+                        <button class="role-btn active" id="btn-role-admin" title="Switch to Chief Administrator">
+                            <span class="role-dot dot-admin"></span>
+                            <span class="role-btn-name">Chief Vance</span>
+                            <span class="role-btn-tag">Admin</span>
+                        </button>
+                        <button class="role-btn" id="btn-role-inv" title="Switch to Lead Investigator">
+                            <span class="role-dot dot-inv"></span>
+                            <span class="role-btn-name">Det. Cole</span>
+                            <span class="role-btn-tag">Investigator</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-action-deposit" id="btn-quick-deposit">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Deposit Exhibit</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- System Telemetry Status Bar -->
+        <div class="system-status-bar">
+            <div class="status-left">
+                <div class="status-indicator">
+                    <span class="pulse-emerald"></span>
+                    <span class="status-text">CRYPTOGRAPHIC ENGINE: <strong>SHA-256 FIPS 180-4 ACTIVE</strong></span>
+                </div>
+                <span class="status-separator">•</span>
+                <span class="status-detail">STORAGE INTEGRITY: <strong>IMMUTABLE WORM EMULATION</strong></span>
+            </div>
+            <div class="status-right">
+                <span id="live-utc-clock" class="mono-clock">UTC 00:00:00</span>
+            </div>
+        </div>
+
+        <!-- Main Views Container -->
+        <main class="app-main">
+
+            <!-- ============================================================
+                 SCREEN 2: CASE DASHBOARD (HOME)
+                 ============================================================ -->
+            <section id="view-dashboard" class="view-section active">
+                <!-- Top Metric Cards -->
+                <div class="metrics-row">
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper icon-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Active Investigations</span>
+                            <div class="stat-value" id="stat-cases-count">4</div>
+                            <span class="stat-sub">Across 4 Classifications</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper icon-indigo">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Secured Evidence Files</span>
+                            <div class="stat-value" id="stat-evidence-count">5</div>
+                            <span class="stat-sub">Cryptographically Sealed</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-card-verified">
+                        <div class="stat-icon-wrapper icon-emerald">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Cryptographic Seal Rate</span>
+                            <div class="stat-value stat-emerald" id="stat-seal-rate">100%</div>
+                            <span class="stat-sub">0 Tamper Violations</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper icon-amber">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Chain-of-Custody Events</span>
+                            <div class="stat-value" id="stat-audit-count">28</div>
+                            <span class="stat-sub">Immutable Audit Records</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls & Filter Toolbar -->
+                <div class="filter-toolbar">
+                    <div class="search-field">
+                        <svg class="search-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="case-search" placeholder="Search investigations by Case Number, Title, or Evidence keyword...">
+                    </div>
+
+                    <div class="toolbar-filters">
+                        <select id="filter-case-status" class="select-pill">
+                            <option value="all">All Statuses</option>
+                            <option value="Open">Open</option>
+                            <option value="Under Investigation">Under Investigation</option>
+                            <option value="In Court">In Court</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+
+                        <select id="filter-case-priority" class="select-pill">
+                            <option value="">All Priorities</option>
+                            <option value="Critical">Critical Acuity</option>
+                            <option value="High">High Acuity</option>
+                            <option value="Medium">Medium Acuity</option>
+                        </select>
+
+                        <button class="btn btn-secondary" id="btn-open-new-case">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            <span>New Case Record</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cases Grid -->
+                <div class="cases-grid" id="cases-grid-container">
+                    <!-- Dynamic Case Cards Rendered Here -->
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 SCREEN 3: CASE DETAIL & EVIDENCE VAULT
+                 ============================================================ -->
+            <section id="view-vault" class="view-section" style="display: none;">
+                <!-- Breadcrumbs & Case Header Bar -->
+                <div class="vault-hero" id="vault-hero-card">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Evidence Section Toolbar -->
+                <div class="vault-subtoolbar">
+                    <div class="subtoolbar-title">
+                        <h2>Cryptographic Evidence Vault</h2>
+                        <span class="subtoolbar-desc">Each digital exhibit is sealed with a 256-bit hash. Tampering of even a single byte triggers an instant cryptographic alarm.</span>
+                    </div>
+
+                    <div class="subtoolbar-actions">
+                        <button class="btn btn-emerald" id="btn-verify-all-exhibits">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                            <span>Verify All SHA-256 Seals</span>
+                        </button>
+                        <button class="btn btn-action-deposit" id="btn-vault-deposit">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            <span>Deposit New Exhibit</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Evidence Exhibits Cards / Table -->
+                <div class="exhibits-stack" id="exhibits-container">
+                    <!-- Rendered dynamically -->
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 SCREEN 5: AUDIT LOG & CHAIN OF CUSTODY (ADMIN VIEW)
+                 ============================================================ -->
+            <section id="view-audit" class="view-section" style="display: none;">
+                <div class="audit-hero-card">
+                    <div class="audit-hero-info">
+                        <div class="audit-icon-seal">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <div>
+                            <h2>Immutable Chain-of-Custody Audit Ledger</h2>
+                            <p>Every exhibit deposition, download, hash check, and tamper simulation is cryptographically timestamped and committed to the compliance ledger.</p>
+                        </div>
+                    </div>
+                    <div class="audit-hero-actions">
+                        <button class="btn btn-secondary" id="btn-refresh-audit">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                            <span>Refresh Trail</span>
+                        </button>
+                        <button class="btn btn-outline" id="btn-export-audit">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Export Court JSON</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Audit Filters -->
+                <div class="audit-filter-bar">
+                    <div class="search-field flex-1">
+                        <svg class="search-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="audit-search" placeholder="Filter audit ledger by Officer, Case ID, Event Type, or Hash snapshot...">
+                    </div>
+
+                    <select id="audit-action-select" class="select-pill">
+                        <option value="">All Action Types</option>
+                        <option value="UPLOAD_EVIDENCE">Evidence Ingress</option>
+                        <option value="VERIFY_HASH_VALID">Seal Validations</option>
+                        <option value="TAMPER_ALERT">Tamper Alarms</option>
+                        <option value="TAMPER_SIMULATION">Tamper Tests</option>
+                        <option value="RESTORE_INTEGRITY">Seal Restorations</option>
+                        <option value="DOWNLOAD_EVIDENCE">Exhibit Downloads</option>
+                        <option value="CREATE_CASE">Case Initiations</option>
+                    </select>
+                </div>
+
+                <!-- Audit Ledger Table -->
+                <div class="table-container">
+                    <table class="vault-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp (UTC)</th>
+                                <th>Authorized Officer</th>
+                                <th>Operation</th>
+                                <th>Target Exhibit / Case</th>
+                                <th>Event Telemetry</th>
+                                <th>SHA-256 Digest Snapshot</th>
+                                <th>IP Origin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 TAMPER LAB (INTERACTIVE DEMO FOR JUDGES & USERS)
+                 ============================================================ -->
+            <section id="view-tamper-lab" class="view-section" style="display: none;">
+                <div class="lab-card">
+                    <div class="lab-header">
+                        <div class="lab-badge">FORENSIC SIMULATION LAB</div>
+                        <h2>How IronGryph Guarantees Evidence Integrity</h2>
+                        <p>Under Federal & State Rules of Evidence, digital exhibits (PDFs, wire logs, CCTV clips, audio depositions) must be verifiable against tampering or silent bit rot. IronGryph calculates an immutable SHA-256 seal at ingress. Even a single changed comma or flipped bit alters the entire hash.</p>
+                    </div>
+
+                    <div class="lab-steps-grid">
+                        <div class="lab-step">
+                            <div class="step-num">01</div>
+                            <h4>Client-Side Pre-Hasing</h4>
+                            <p>Using the browser's hardware-accelerated <code>crypto.subtle</code> API, the file digest is computed locally before upload begins.</p>
+                        </div>
+
+                        <div class="lab-step">
+                            <div class="step-num">02</div>
+                            <h4>Server Intake Sealing</h4>
+                            <p>The backend re-computes the 256-bit digest on the raw byte stream and records it into an immutable audit ledger.</p>
+                        </div>
+
+                        <div class="lab-step">
+                            <div class="step-num">03</div>
+                            <h4>Continuous Verification</h4>
+                            <p>Anytime an exhibit is checked, the server re-streams the physical disk file. If hash matches: <strong>Green Verified Shield</strong>. If bytes altered: <strong>Red Warning Alarm</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="lab-demo-box">
+                        <h3>🧪 Live Penetration & Tamper Simulation</h3>
+                        <p>Test the cryptographic integrity engine right now on one of the active case exhibits:</p>
+                        <div class="lab-demo-controls">
+                            <select id="lab-exhibit-select" class="select-pill">
+                                <!-- Populated dynamically with exhibits -->
+                            </select>
+                            <button class="btn btn-danger" id="lab-btn-tamper">
+                                ⚠️ Simulate Unauthorized File Modification
+                            </button>
+                            <button class="btn btn-emerald" id="lab-btn-restore">
+                                🔄 Restore to Canonical Authentic State
+                            </button>
+                            <button class="btn btn-secondary" id="lab-btn-verify">
+                                🛡️ Run Live Verification Check
+                            </button>
+                        </div>
+                        <div id="lab-result-card" class="lab-result" style="display: none;">
+                            <!-- Output of verification test -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ============================================================
+             SCREEN 4: UPLOAD MODAL (FLOATING INGRESS DIALOG)
+             ============================================================ -->
+        <div id="modal-upload" class="modal-layer" style="display: none;">
+            <div class="modal-box">
+                <div class="modal-box-header">
+                    <div class="modal-title-group">
+                        <div class="modal-badge-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <div>
+                            <h3>Deposit Exhibit Into Evidence Vault</h3>
+                            <span class="modal-sub">Cryptographic SHA-256 seal will be computed and permanently logged</span>
+                        </div>
+                    </div>
+                    <button class="modal-close-btn" id="modal-upload-close">&times;</button>
+                </div>
+
+                <form id="form-evidence-upload" class="modal-body-form">
+                    <div class="form-row">
+                        <label class="form-label">Target Investigation Case</label>
+                        <select id="input-upload-case" class="form-select" required>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="form-split">
+                        <div class="form-row flex-2">
+                            <label class="form-label">Exhibit Title</label>
+                            <input type="text" id="input-upload-title" class="form-input" required placeholder="e.g., SWIFT Offshore Wire Record #44-A">
+                        </div>
+                        <div class="form-row flex-1">
+                            <label class="form-label">Classification Category</label>
+                            <select id="input-upload-category" class="form-select" required>
+                                <option value="Forensic Report">Forensic Report</option>
+                                <option value="Financial Record">Financial Record</option>
+                                <option value="Surveillance Photo">Surveillance Photo</option>
+                                <option value="Cyber Forensics">Cyber Forensics</option>
+                                <option value="Witness Deposition">Witness Deposition</option>
+                                <option value="Physical Evidence">Physical Evidence</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Chain of Custody / Intake Notes</label>
+                        <textarea id="input-upload-desc" class="form-textarea" rows="2" placeholder="Seized under search warrant W-4902 by lead investigator..."></textarea>
+                    </div>
+
+                    <!-- Enhanced Drag & Drop Zone with Real-Time WebCrypto SHA-256 Preview -->
+                    <div class="form-row">
+                        <label class="form-label">Physical Exhibit File (Max 50MB)</label>
+                        <div class="upload-dropzone" id="file-dropzone">
+                            <input type="file" id="file-input-raw" class="dropzone-hidden-input" required>
+                            
+                            <div class="dropzone-idle" id="dropzone-idle-state">
+                                <div class="dropzone-cloud-icon">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                </div>
+                                <div class="dropzone-text">
+                                    <strong>Click to browse or drag & drop exhibit here</strong>
+                                    <span>Accepts .PDF, .JPG, .PNG, .RAW, .TXT, .CSV, .DOCX</span>
+                                </div>
+                            </div>
+
+                            <div class="dropzone-ready" id="dropzone-ready-state" style="display: none;">
+                                <div class="file-ready-header">
+                                    <span class="ready-filename" id="ready-filename">document.pdf</span>
+                                    <span class="ready-filesize" id="ready-filesize">2.4 MB</span>
+                                </div>
+                                <div class="live-hash-box">
+                                    <div class="live-hash-tag">
+                                        <span class="live-dot"></span>
+                                        <span>CLIENT-SIDE COMPUTED SHA-256 DIGEST:</span>
+                                    </div>
+                                    <code class="live-hash-hex" id="ready-hash">Computing live cryptographic seal...</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="modal-upload-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-action-deposit" id="btn-submit-upload">
+                            🔒 Compute Seal & Commit Exhibit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- NEW CASE INITIATION MODAL -->
+        <div id="modal-new-case" class="modal-layer" style="display: none;">
+            <div class="modal-box">
+                <div class="modal-box-header">
+                    <div class="modal-title-group">
+                        <div class="modal-badge-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div>
+                            <h3>Initiate Investigation Case File</h3>
+                            <span class="modal-sub">Creates an isolated evidence vault directory and case ledger entry</span>
+                        </div>
+                    </div>
+                    <button class="modal-close-btn" id="modal-case-close">&times;</button>
+                </div>
+
+                <form id="form-new-case" class="modal-body-form">
+                    <div class="form-row">
+                        <label class="form-label">Operation / Case Title</label>
+                        <input type="text" id="case-create-title" class="form-input" required placeholder="e.g., Operation Silverline: Port Syndicate Fraud">
+                    </div>
+
+                    <div class="form-split">
+                        <div class="form-row flex-1">
+                            <label class="form-label">Legal Classification</label>
+                            <select id="case-create-category" class="form-select" required>
+                                <option value="Financial Fraud">Financial Fraud</option>
+                                <option value="Cybercrime">Cybercrime</option>
+                                <option value="Narcotics">Narcotics</option>
+                                <option value="Public Corruption">Public Corruption</option>
+                                <option value="Homicide">Homicide</option>
+                                <option value="Internal Affairs">Internal Affairs</option>
+                            </select>
+                        </div>
+                        <div class="form-row flex-1">
+                            <label class="form-label">Priority Acuity</label>
+                            <select id="case-create-priority" class="form-select" required>
+                                <option value="Critical">Critical Priority</option>
+                                <option value="High" selected>High Priority</option>
+                                <option value="Medium">Medium Priority</option>
+                                <option value="Low">Low Priority</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Investigation Briefing & Probable Cause</label>
+                        <textarea id="case-create-desc" class="form-textarea" rows="3" placeholder="Summary of preliminary findings, jurisdictional warrants, and suspect entities..."></textarea>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="modal-case-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-action-deposit">Initiate Case Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Notifications Hub -->
+        <div id="toast-hub" class="toast-hub"></div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

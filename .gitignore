@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+
+# ML Models (large files)
+app/ml/saved_models/*.pkl
+app/ml/saved_models/*.joblib
+app/ml/saved_models/*.json
+!app/ml/saved_models/.gitkeep
+
+# Database
+*.db
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Uploads & backups
+legal_system/uploads/*
+!legal_system/uploads/.gitkeep
+*.canonical_bak
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
