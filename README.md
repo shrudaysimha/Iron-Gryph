@@ -43,6 +43,15 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 - **Interactive Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
+### Running the Hospital Frontend (Next.js)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- **Web App**: [http://localhost:3000](http://localhost:3000)
+- **Direct Access**: Pre-configured without login barriers. Directly loads Real-time Monitoring Dashboard, What-If Scenario Simulator, CSV Upload Ingress, and AI Clinical Assistant.
+
 ---
 
 ## 🧪 Testing
@@ -59,6 +68,18 @@ pytest tests -v
 
 ```
 Iron-Gryph/
+├── frontend/                   # Hospital Early Warning System Web App (Next.js + Tailwind)
+│   ├── src/
+│   │   ├── app/                # App Router (dashboard, simulator, upload, chat)
+│   │   ├── components/         # Navigation, metric cards, sliders, badges
+│   │   └── types/              # TypeScript schemas
+│   └── package.json
+├── app/                        # Hospital Surge Prediction & Resource AI
+│   ├── api/v1/                 # Endpoints (hospitals, patients, predictions, staff)
+│   ├── ml/                     # ML demand forecaster & optimizer
+│   ├── models/                 # ORM models
+│   ├── schemas/                # Schemas
+│   └── services/               # Weather, events, allocations, alerts
 ├── legal_system/               # Legal & Investigation Evidence Vault
 │   ├── app/
 │   │   ├── routers/            # cases, evidence, audit, auth endpoints
@@ -72,12 +93,7 @@ Iron-Gryph/
 │   │   ├── seed.py             # Pre-seeded cases, exhibits, audit records
 │   │   └── main.py             # FastAPI entrypoint
 │   └── README.md               # Legal system & mobile integration guide
-├── app/                        # Hospital Surge Prediction & Resource AI
-│   ├── api/v1/                 # Endpoints (hospitals, patients, predictions, staff)
-│   ├── ml/                     # ML demand forecaster & optimizer
-│   ├── models/                 # ORM models
-│   ├── schemas/                # Schemas
-│   └── services/               # Weather, events, allocations, alerts
+├── refrence/                   # UI reference templates
 ├── tests/
 │   ├── test_legal_system.py    # 5/5 legal vault tests
 │   ├── test_api.py             # Surge API tests
