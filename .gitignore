@@ -51,3 +51,6 @@ legal_system/uploads/*
 .pytest_cache/
 htmlcov/
 .coverage
+
+# Archives
+*.zip

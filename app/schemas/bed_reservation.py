@@ -6,17 +6,19 @@ from pydantic import BaseModel, ConfigDict
 
 class BedReserveRequest(BaseModel):
     """Request to reserve a specific bed."""
-    bed_id: int
-    hospital_id: int
-    patient_name: str
+    bed_id: int | str
+    hospital_id: int = 1
+    patient_name: str | None = "Emergency Patient"
+    coordinator_id: str | None = None
     triage_score: int = 3  # 1=Resuscitation, 2=Emergency, 3=Urgent
 
 
 class BedReserveResponse(BaseModel):
     """Response after a successful bed reservation."""
     success: bool
+    token: str
     reservation_token: str
-    bed_id: int
+    bed_id: int | str
     bed_number: str
     ward_name: str
     ward_type: str

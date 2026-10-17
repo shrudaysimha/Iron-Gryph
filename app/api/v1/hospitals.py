@@ -1,6 +1,6 @@
 """Hospital API endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -161,3 +161,25 @@ def create_ward(hospital_id: int, ward: WardCreate, db: Session = Depends(get_db
         available_beds=db_ward.available_beds,
         occupancy_rate=0.0,
     )
+
+
+# Active diversion memory
+_diversion_states: dict[int, bool] = {1: False, 2: False, 3: False}
+
+
+@router.post("/diversion-status")
+def set_diversion_status(
+    hospital_id: int = Query(default=1),
+    is_diverted: bool = Query(default=True),
+    reason: str = Query(default="ED/ICU Capacity Critical"),
+):
+    """Toggle hospital emergency diversion status."""
+    _diversion_states[hospital_id] = is_diverted
+    return {
+        "hospital_id": hospital_id,
+        "is_diverted": is_diverted,
+        "status": "DIVERTED" if is_diverted else "ACCEPTING",
+        "reason": reason if is_diverted else "Nominal Operations",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+

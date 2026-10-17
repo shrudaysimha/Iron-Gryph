@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1 import hospitals, patients, staff, ambulances, predictions, allocations, alerts, dashboard, environment, beds
+from app.api.v1 import hospitals, patients, staff, ambulances, predictions, allocations, alerts, dashboard, environment, beds, opd
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -16,4 +16,6 @@ api_router.include_router(predictions.router, prefix="/predictions", tags=["Pred
 api_router.include_router(allocations.router, prefix="/allocations", tags=["Allocations"])
 api_router.include_router(alerts.router, prefix="/alerts", tags=["Alerts"])
 api_router.include_router(environment.router, prefix="/environment", tags=["Environment & Events"])
+api_router.include_router(opd.router, prefix="/opd", tags=["OPD & Prescriptions"])
+
 

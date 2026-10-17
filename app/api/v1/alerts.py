@@ -79,3 +79,50 @@ def evaluate_alerts(
     new_alerts = service.evaluate_and_generate_alerts(hospital_id)
     return new_alerts
 
+
+@router.post("/stat-callout")
+async def trigger_stat_callout(
+    hospital_id: int = Query(default=1),
+    message: str = Query(default="STAT Trauma Alert: Mass Casualty Inbound"),
+    db: Session = Depends(get_db),
+):
+    """Trigger Code Red / Mass Casualty Protocol and broadcast to all connected WebSocket clients."""
+    from app.models.alert import Alert
+    alert = Alert(
+        hospital_id=hospital_id,
+        alert_type="mass_casualty",
+        severity="critical",
+        title="CODE RED: STAT TRAUMA CALLOUT",
+        message=message,
+        acknowledged=False,
+    )
+    db.add(alert)
+    db.commit()
+    db.refresh(alert)
+
+    # Broadcast via WebSocket
+    try:
+        from app.main import alert_manager
+        await alert_manager.broadcast_alert({
+            "type": "CODE_RED",
+            "message": alert.message,
+            "data": {
+                "alert_id": alert.id,
+                "hospital_id": hospital_id,
+                "severity": "critical",
+            },
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }, hospital_id=hospital_id)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "alert_id": alert.id,
+        "type": "CODE_RED",
+        "message": alert.message,
+        "protocol": "Mass Casualty Protocol Activated",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+

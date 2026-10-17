@@ -200,10 +200,60 @@ def health_check():
     }
 
 
-@app.get("/", tags=["System"])
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static assets
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/", include_in_schema=False)
 def root():
-    """API root endpoint providing status and documentation links."""
+    """Serve the MediBook application or API info."""
+    beds_file = STATIC_DIR / "beds.html"
+    if beds_file.exists():
+        return FileResponse(str(beds_file))
     return get_api_info()
+
+
+@app.get("/beds", include_in_schema=False)
+def serve_beds():
+    """Serve the MediBook Beds screen."""
+    beds_file = STATIC_DIR / "beds.html"
+    if beds_file.exists():
+        return FileResponse(str(beds_file))
+    return get_api_info()
+
+
+@app.get("/triage", include_in_schema=False)
+def serve_triage():
+    """Serve the MediBook Triage screen."""
+    triage_file = STATIC_DIR / "triage.html"
+    if triage_file.exists():
+        return FileResponse(str(triage_file))
+    return FileResponse(str(STATIC_DIR / "beds.html"))
+
+
+@app.get("/ems-live", include_in_schema=False)
+def serve_ems():
+    """Serve the MediBook EMS Live screen."""
+    ems_file = STATIC_DIR / "ems.html"
+    if ems_file.exists():
+        return FileResponse(str(ems_file))
+    return FileResponse(str(STATIC_DIR / "beds.html"))
+
+
+@app.get("/doctors-rx", include_in_schema=False)
+def serve_doctors():
+    """Serve the MediBook Doctors & Rx screen."""
+    doc_file = STATIC_DIR / "doctors.html"
+    if doc_file.exists():
+        return FileResponse(str(doc_file))
+    return FileResponse(str(STATIC_DIR / "beds.html"))
 
 
 @app.get("/api/info", tags=["System"])

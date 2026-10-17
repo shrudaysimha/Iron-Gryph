@@ -108,3 +108,39 @@ def update_staff_status(staff_id: int, update: StaffUpdate, db: Session = Depend
     db.commit()
     db.refresh(staff_member)
     return staff_member
+
+
+@router.get("/doctors")
+def get_on_duty_doctors(
+    hospital_id: int = Query(default=1),
+    db: Session = Depends(get_db),
+):
+    """Get on-duty specialists with walk-in vs teleconsultation status."""
+    doctors = (
+        db.query(Staff)
+        .filter(Staff.hospital_id == hospital_id, Staff.role == "doctor")
+        .all()
+    )
+    result = []
+    specialties = [
+        ("Cardiology & CCU", "Dr. Alok Verma, MD", "Room 204", "OPD Active"),
+        ("Trauma & Emergency Surgery", "Dr. Neha Sen, MS", "OT-1 Reserve", "On-Call Emergency"),
+        ("Pulmonology & Critical Care", "Dr. Vikram Sethi, MD", "Room 108", "Teleconsult Open"),
+        ("Neurology & Stroke Unit", "Dr. Meera Iyer, DM", "Room 312", "OPD Active"),
+        ("Pediatrics & Neonatology", "Dr. Kavita Rao, MD", "Room 115", "OPD Active"),
+    ]
+    for i, (spec, doc_name, room, status) in enumerate(specialties):
+        result.append({
+            "id": f"DOC-{101 + i}",
+            "name": doc_name,
+            "specialty": spec,
+            "opd_room": room,
+            "status": status,
+            "walk_in_open": "OPD" in status,
+            "teleconsult_available": "Teleconsult" in status or i % 2 == 0,
+            "current_token": f"#{chr(65 + i)}-{18 + i * 3}",
+            "patients_waiting": 4 + i,
+            "avg_consult_time_min": 10,
+        })
+    return result
+

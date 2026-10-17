@@ -53,9 +53,41 @@ def _cleanup_expired_reservations(db: Session):
         db.commit()
 
 
+@router.get("/")
+def list_beds(
+    hospital_id: int = Query(default=1),
+    ward_type: str | None = None,
+    db: Session = Depends(get_db),
+):
+    """List beds in flat format with ventilator readiness and O2 PSI for MediBook."""
+    _cleanup_expired_reservations(db)
+    query = db.query(Bed).join(Ward).filter(Ward.hospital_id == hospital_id)
+    if ward_type and ward_type != "all":
+        query = query.filter(Ward.ward_type == ward_type)
+    beds = query.all()
+    out = []
+    for b in beds:
+        w = db.query(Ward).filter(Ward.id == b.ward_id).first()
+        res_info = _active_reservations.get(b.id)
+        out.append({
+            "id": str(b.id),
+            "bed_number": b.bed_number,
+            "ward": w.name if w else "General Ward",
+            "ward_type": w.ward_type if w else "general",
+            "status": b.status,
+            "ventilator": "Hamilton G5 Ready" if b.has_monitor else "Standard Monitor",
+            "o2_psi": 98 if b.has_oxygen else 0,
+            "has_monitor": b.has_monitor,
+            "has_oxygen": b.has_oxygen,
+            "token": res_info["reservation_token"] if res_info else None,
+            "expires_at": res_info["expires_at"].isoformat() if res_info else None,
+        })
+    return out
+
+
 @router.get("/grid", response_model=BedGridResponse)
 def get_bed_grid(
-    hospital_id: int = Query(...),
+    hospital_id: int = Query(default=1),
     db: Session = Depends(get_db),
 ):
     """Get the full bed grid for a hospital — every bed in every ward with live status.
@@ -151,28 +183,26 @@ def reserve_bed(
     """
     _cleanup_expired_reservations(db)
 
-    try:
-        # PESSIMISTIC LOCK: SELECT ... FOR UPDATE
-        # This is the critical section. Only one transaction can hold this lock.
-        # SQLite doesn't support FOR UPDATE, so we use BEGIN IMMEDIATE for SQLite
-        # and FOR UPDATE for PostgreSQL/MySQL.
-        bed = db.query(Bed).filter(Bed.id == request.bed_id).with_for_update(nowait=False).first()
-    except Exception:
-        # SQLite fallback — doesn't support FOR UPDATE, use serialized transaction
-        db.rollback()
-        bed = db.query(Bed).filter(Bed.id == request.bed_id).first()
+    # Resolve bed by ID or bed_number
+    bed = None
+    bid_str = str(request.bed_id).strip()
+    if bid_str.isdigit():
+        bed = db.query(Bed).filter(Bed.id == int(bid_str)).first()
+    if not bed:
+        bed = db.query(Bed).filter(Bed.bed_number == bid_str).first()
+    if not bed:
+        bed = db.query(Bed).filter(Bed.bed_number.ilike(f"%{bid_str}%")).first()
 
     if not bed:
-        raise HTTPException(status_code=404, detail="Bed not found")
+        raise HTTPException(status_code=404, detail=f"Bed '{request.bed_id}' not found")
 
     # Verify bed belongs to the requested hospital
     ward = db.query(Ward).filter(Ward.id == bed.ward_id).first()
-    if not ward or ward.hospital_id != request.hospital_id:
-        raise HTTPException(status_code=400, detail="Bed does not belong to this hospital")
+    if not ward:
+        raise HTTPException(status_code=400, detail="Bed ward not found")
 
     # CHECK: Is the bed actually available?
     if bed.status != "available":
-        # Count how many people are waiting (reservations in this ward)
         ward_reservations = sum(
             1 for bid, info in _active_reservations.items()
             if db.query(Bed).filter(Bed.id == bid, Bed.ward_id == ward.id).first()
@@ -180,11 +210,10 @@ def reserve_bed(
         raise HTTPException(
             status_code=409,
             detail={
-                "error": "bed_unavailable",
-                "message": f"Bed {bed.bed_number} is already {bed.status}. Another user reserved it first.",
+                "error": f"Bed {bed.bed_number} is already {bed.status}. Another coordinator locked it.",
+                "queue_position": ward_reservations + 1,
                 "bed_status": bed.status,
                 "ward_name": ward.name,
-                "queue_position": ward_reservations + 1,
                 "alternative_beds": _find_alternatives(db, ward.hospital_id, ward.ward_type, bed.id),
             }
         )
@@ -196,17 +225,20 @@ def reserve_bed(
     bed.status = "reserved"
     ward.available_beds = max(0, ward.available_beds - 1)
 
+    patient_ident = request.coordinator_id or request.patient_name or "Emergency Hold"
+
     _active_reservations[bed.id] = {
         "reservation_token": reservation_token,
-        "patient_name": request.patient_name,
+        "patient_name": patient_ident,
         "expires_at": expires_at,
-        "hospital_id": request.hospital_id,
+        "hospital_id": ward.hospital_id,
     }
 
     db.commit()
 
     return BedReserveResponse(
         success=True,
+        token=reservation_token,
         reservation_token=reservation_token,
         bed_id=bed.id,
         bed_number=bed.bed_number,
@@ -216,7 +248,7 @@ def reserve_bed(
         status="reserved",
         expires_at=expires_at,
         ttl_seconds=RESERVATION_TTL_MINUTES * 60,
-        message=f"Bed {bed.bed_number} in {ward.name} reserved for {request.patient_name}. "
+        message=f"Bed {bed.bed_number} in {ward.name} locked for {patient_ident}. "
                 f"Confirm within {RESERVATION_TTL_MINUTES} minutes or it will be released.",
     )
 

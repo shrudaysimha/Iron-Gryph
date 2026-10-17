@@ -7,14 +7,12 @@ from sqlalchemy.orm import Session
 from app.models.patient import Admission
 from app.models.hospital import Ward
 from app.models.ambulance import Ambulance
-from app.services.weather_service import WeatherService
-from app.services.event_service import EventService
-
-
 class FeatureEngineer:
     """Extracts features from database state for ML model input."""
 
     def __init__(self, db: Session):
+        from app.services.weather_service import WeatherService
+        from app.services.event_service import EventService
         self.db = db
         self.weather_service = WeatherService()
         self.event_service = EventService()
