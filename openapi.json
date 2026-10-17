@@ -1,0 +1,4782 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hospital Surge AI API",
+    "description": "AI-powered hospital demand surge prediction and dynamic resource allocation engine. Integrates historical admissions, real-time arrivals, ambulance telemetry, bed capacity, and environmental variables to recommend life-saving resource adjustments.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/dashboard/overview": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Get Dashboard Overview",
+        "description": "Get complete dashboard overview for a hospital.",
+        "operationId": "get_dashboard_overview_api_v1_dashboard_overview_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOverview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard/metrics": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Get Dashboard Metrics",
+        "description": "Get time-series metrics for dashboard charts.",
+        "operationId": "get_dashboard_metrics_api_v1_dashboard_metrics_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(24h|7d|30d)$",
+              "default": "24h",
+              "title": "Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardMetrics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hospitals/": {
+      "get": {
+        "tags": [
+          "Hospitals"
+        ],
+        "summary": "List Hospitals",
+        "description": "List all hospitals with optional filtering.",
+        "operationId": "list_hospitals_api_v1_hospitals__get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "City"
+            }
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HospitalResponse"
+                  },
+                  "title": "Response List Hospitals Api V1 Hospitals  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hospitals"
+        ],
+        "summary": "Create Hospital",
+        "description": "Create a new hospital.",
+        "operationId": "create_hospital_api_v1_hospitals__post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HospitalCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HospitalResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hospitals/{hospital_id}": {
+      "get": {
+        "tags": [
+          "Hospitals"
+        ],
+        "summary": "Get Hospital",
+        "description": "Get hospital details including ward summary.",
+        "operationId": "get_hospital_api_v1_hospitals__hospital_id__get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HospitalDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Hospitals"
+        ],
+        "summary": "Update Hospital",
+        "description": "Update hospital information.",
+        "operationId": "update_hospital_api_v1_hospitals__hospital_id__put",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HospitalUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HospitalResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hospitals/{hospital_id}/capacity": {
+      "get": {
+        "tags": [
+          "Hospitals"
+        ],
+        "summary": "Get Hospital Capacity",
+        "description": "Get current capacity status for a hospital.",
+        "operationId": "get_hospital_capacity_api_v1_hospitals__hospital_id__capacity_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HospitalCapacity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hospitals/{hospital_id}/wards": {
+      "post": {
+        "tags": [
+          "Hospitals"
+        ],
+        "summary": "Create Ward",
+        "description": "Create a new ward in a hospital.",
+        "operationId": "create_ward_api_v1_hospitals__hospital_id__wards_post",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WardCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WardSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/admit": {
+      "post": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Admit Patient",
+        "description": "Create a patient and admit them to a hospital in one step.",
+        "operationId": "admit_patient_api_v1_patients_admit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdmitPatientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdmissionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/{admission_id}/discharge": {
+      "put": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Discharge Patient",
+        "description": "Discharge a patient and free their bed.",
+        "operationId": "discharge_patient_api_v1_patients__admission_id__discharge_put",
+        "parameters": [
+          {
+            "name": "admission_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Admission Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DischargeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdmissionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/current": {
+      "get": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Get Current Patients",
+        "description": "List all currently admitted patients at a hospital.",
+        "operationId": "get_current_patients_api_v1_patients_current_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Department"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdmissionDetail"
+                  },
+                  "title": "Response Get Current Patients Api V1 Patients Current Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/history": {
+      "get": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Get Admission History",
+        "description": "Get admission history for the last N days.",
+        "operationId": "get_admission_history_api_v1_patients_history_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdmissionResponse"
+                  },
+                  "title": "Response Get Admission History Api V1 Patients History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/beds/grid": {
+      "get": {
+        "tags": [
+          "Bed Reservation"
+        ],
+        "summary": "Get Bed Grid",
+        "description": "Get the full bed grid for a hospital \u2014 every bed in every ward with live status.\n\nThis powers the interactive bed map on the frontend. Each bed tile\nshows its real-time status (available / occupied / reserved / maintenance).",
+        "operationId": "get_bed_grid_api_v1_beds_grid_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BedGridResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/beds/reserve": {
+      "post": {
+        "tags": [
+          "Bed Reservation"
+        ],
+        "summary": "Reserve Bed",
+        "description": "Reserve a specific bed using pessimistic locking.\n\n## Concurrency Safety (The \"100 Users\" Problem)\n\nWhen 100 users simultaneously click \"Reserve\" on the same bed:\n\n1. **SELECT FOR UPDATE** acquires an exclusive row-level lock on the bed row.\n   Only ONE transaction can hold this lock at a time.\n2. The winning transaction checks `status == 'available'` and sets it to `'reserved'`.\n3. All other 99 transactions will either:\n   - Wait for the lock (FIFO queue), then find `status != 'available'` \u2192 get 409 Conflict\n   - With NOWAIT: immediately get 409 Conflict without waiting\n4. A WebSocket broadcast notifies all connected clients that the bed status changed.\n5. The reservation has a 5-minute TTL. If not confirmed, the bed auto-releases.",
+        "operationId": "reserve_bed_api_v1_beds_reserve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BedReserveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BedReserveResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/beds/confirm": {
+      "post": {
+        "tags": [
+          "Bed Reservation"
+        ],
+        "summary": "Confirm Reservation",
+        "description": "Confirm a reservation \u2014 transitions bed from 'reserved' to 'occupied'.",
+        "operationId": "confirm_reservation_api_v1_beds_confirm_post",
+        "parameters": [
+          {
+            "name": "bed_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Bed Id"
+            }
+          },
+          {
+            "name": "reservation_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reservation Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/beds/release": {
+      "post": {
+        "tags": [
+          "Bed Reservation"
+        ],
+        "summary": "Release Reservation",
+        "description": "Release a reservation \u2014 returns bed to 'available'.",
+        "operationId": "release_reservation_api_v1_beds_release_post",
+        "parameters": [
+          {
+            "name": "bed_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Bed Id"
+            }
+          },
+          {
+            "name": "reservation_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reservation Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/staff/on-duty": {
+      "get": {
+        "tags": [
+          "Staff"
+        ],
+        "summary": "Get On Duty Staff",
+        "description": "Get all currently on-duty staff at a hospital.",
+        "operationId": "get_on_duty_staff_api_v1_staff_on_duty_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffResponse"
+                  },
+                  "title": "Response Get On Duty Staff Api V1 Staff On Duty Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/staff/availability": {
+      "get": {
+        "tags": [
+          "Staff"
+        ],
+        "summary": "Get Staff Availability",
+        "description": "Get staff availability summary for a hospital.",
+        "operationId": "get_staff_availability_api_v1_staff_availability_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffAvailability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/staff/": {
+      "post": {
+        "tags": [
+          "Staff"
+        ],
+        "summary": "Create Staff",
+        "description": "Add a new staff member.",
+        "operationId": "create_staff_api_v1_staff__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/staff/{staff_id}/status": {
+      "put": {
+        "tags": [
+          "Staff"
+        ],
+        "summary": "Update Staff Status",
+        "description": "Update a staff member's duty status or shift.",
+        "operationId": "update_staff_status_api_v1_staff__staff_id__status_put",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Staff Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ambulances/": {
+      "get": {
+        "tags": [
+          "Ambulances"
+        ],
+        "summary": "List Ambulances",
+        "description": "List ambulances for a hospital.",
+        "operationId": "list_ambulances_api_v1_ambulances__get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AmbulanceResponse"
+                  },
+                  "title": "Response List Ambulances Api V1 Ambulances  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ambulances"
+        ],
+        "summary": "Create Ambulance",
+        "description": "Register a new ambulance.",
+        "operationId": "create_ambulance_api_v1_ambulances__post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbulanceCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmbulanceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ambulances/fleet-status": {
+      "get": {
+        "tags": [
+          "Ambulances"
+        ],
+        "summary": "Get Fleet Status",
+        "description": "Get aggregated fleet status for a hospital.",
+        "operationId": "get_fleet_status_api_v1_ambulances_fleet_status_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FleetStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ambulances/{ambulance_id}/dispatch": {
+      "put": {
+        "tags": [
+          "Ambulances"
+        ],
+        "summary": "Dispatch Ambulance",
+        "description": "Dispatch an ambulance to a destination.",
+        "operationId": "dispatch_ambulance_api_v1_ambulances__ambulance_id__dispatch_put",
+        "parameters": [
+          {
+            "name": "ambulance_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Ambulance Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DispatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmbulanceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ambulances/{ambulance_id}/status": {
+      "put": {
+        "tags": [
+          "Ambulances"
+        ],
+        "summary": "Update Ambulance Status",
+        "description": "Update ambulance status and location.",
+        "operationId": "update_ambulance_status_api_v1_ambulances__ambulance_id__status_put",
+        "parameters": [
+          {
+            "name": "ambulance_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Ambulance Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbulanceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmbulanceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/predictions/demand": {
+      "get": {
+        "tags": [
+          "Predictions"
+        ],
+        "summary": "Get Demand Forecast",
+        "description": "Get the latest demand prediction for a hospital.",
+        "operationId": "get_demand_forecast_api_v1_predictions_demand_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "horizon_hours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 72,
+              "minimum": 1,
+              "default": 4,
+              "title": "Horizon Hours"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PredictionResponse"
+                  },
+                  "title": "Response Get Demand Forecast Api V1 Predictions Demand Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/predictions/generate": {
+      "post": {
+        "tags": [
+          "Predictions"
+        ],
+        "summary": "Generate Prediction",
+        "description": "Trigger a new demand prediction using the ML model.",
+        "operationId": "generate_prediction_api_v1_predictions_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PredictionResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Generate Prediction Api V1 Predictions Generate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/predictions/history": {
+      "get": {
+        "tags": [
+          "Predictions"
+        ],
+        "summary": "Get Prediction History",
+        "description": "Get past predictions with actual values for model evaluation.",
+        "operationId": "get_prediction_history_api_v1_predictions_history_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PredictionHistory"
+                  },
+                  "title": "Response Get Prediction History Api V1 Predictions History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/predictions/train": {
+      "post": {
+        "tags": [
+          "Predictions"
+        ],
+        "summary": "Retrain Model",
+        "description": "Trigger retraining of the demand prediction model.",
+        "operationId": "retrain_model_api_v1_predictions_train_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/allocations/recommend": {
+      "get": {
+        "tags": [
+          "Allocations"
+        ],
+        "summary": "Get Allocation Recommendation",
+        "description": "Get AI-powered resource allocation recommendations.",
+        "operationId": "get_allocation_recommendation_api_v1_allocations_recommend_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllocationPlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/allocations/apply": {
+      "post": {
+        "tags": [
+          "Allocations"
+        ],
+        "summary": "Apply Allocation",
+        "description": "Apply recommended resource allocations.",
+        "operationId": "apply_allocation_api_v1_allocations_apply_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyAllocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/": {
+      "get": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Get Alerts",
+        "description": "Get active alerts for a hospital.",
+        "operationId": "get_alerts_api_v1_alerts__get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          },
+          {
+            "name": "unacknowledged_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Unacknowledged Only"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlertResponse"
+                  },
+                  "title": "Response Get Alerts Api V1 Alerts  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/{alert_id}/acknowledge": {
+      "put": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Acknowledge Alert",
+        "description": "Acknowledge an alert.",
+        "operationId": "acknowledge_alert_api_v1_alerts__alert_id__acknowledge_put",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcknowledgeAlertRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/{alert_id}/resolve": {
+      "put": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Resolve Alert",
+        "description": "Mark an alert as resolved.",
+        "operationId": "resolve_alert_api_v1_alerts__alert_id__resolve_put",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/evaluate": {
+      "post": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Evaluate Alerts",
+        "description": "Evaluate real-time metrics against safety thresholds and generate alerts.",
+        "operationId": "evaluate_alerts_api_v1_alerts_evaluate_post",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlertResponse"
+                  },
+                  "title": "Response Evaluate Alerts Api V1 Alerts Evaluate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/environment/weather": {
+      "get": {
+        "tags": [
+          "Environment & Events"
+        ],
+        "summary": "Get Weather",
+        "description": "Get current weather conditions and patient surge risk multiplier.",
+        "operationId": "get_weather_api_v1_environment_weather_get",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "City"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/environment/events": {
+      "get": {
+        "tags": [
+          "Environment & Events"
+        ],
+        "summary": "Get Events",
+        "description": "Get active local events and emergency incidents affecting coverage area.",
+        "operationId": "get_events_api_v1_environment_events_get",
+        "parameters": [
+          {
+            "name": "hospital_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Hospital Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Environment & Events"
+        ],
+        "summary": "Create Event",
+        "description": "Register a new mass gathering event.",
+        "operationId": "create_event_api_v1_environment_events_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/environment/incident": {
+      "post": {
+        "tags": [
+          "Environment & Events"
+        ],
+        "summary": "Report Incident",
+        "description": "Report an emergency mass casualty or traffic incident.",
+        "operationId": "report_incident_api_v1_environment_incident_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "description": "Verify application health and database connection.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Root",
+        "description": "API root endpoint providing status and documentation links.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/info": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Get Api Info",
+        "description": "Root info endpoint detailing all active API routes and documentation.",
+        "operationId": "get_api_info_api_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcknowledgeAlertRequest": {
+        "properties": {
+          "acknowledged_by": {
+            "type": "string",
+            "title": "Acknowledged By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "acknowledged_by"
+        ],
+        "title": "AcknowledgeAlertRequest"
+      },
+      "AdmissionDetail": {
+        "properties": {
+          "department": {
+            "type": "string",
+            "title": "Department",
+            "default": "emergency"
+          },
+          "diagnosis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diagnosis"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "default": "moderate"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "patient_id": {
+            "type": "integer",
+            "title": "Patient Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "bed_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bed Id"
+          },
+          "attending_doctor_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attending Doctor Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "admitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Admitted At"
+          },
+          "discharged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discharged At"
+          },
+          "expected_discharge": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Discharge"
+          },
+          "length_of_stay_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length Of Stay Hours"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "patient": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PatientResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "patient_id",
+          "hospital_id",
+          "bed_id",
+          "attending_doctor_id",
+          "status",
+          "admitted_at",
+          "discharged_at",
+          "expected_discharge",
+          "length_of_stay_hours",
+          "created_at"
+        ],
+        "title": "AdmissionDetail"
+      },
+      "AdmissionResponse": {
+        "properties": {
+          "department": {
+            "type": "string",
+            "title": "Department",
+            "default": "emergency"
+          },
+          "diagnosis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diagnosis"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "default": "moderate"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "patient_id": {
+            "type": "integer",
+            "title": "Patient Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "bed_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bed Id"
+          },
+          "attending_doctor_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attending Doctor Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "admitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Admitted At"
+          },
+          "discharged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discharged At"
+          },
+          "expected_discharge": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Discharge"
+          },
+          "length_of_stay_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length Of Stay Hours"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "patient_id",
+          "hospital_id",
+          "bed_id",
+          "attending_doctor_id",
+          "status",
+          "admitted_at",
+          "discharged_at",
+          "expected_discharge",
+          "length_of_stay_hours",
+          "created_at"
+        ],
+        "title": "AdmissionResponse"
+      },
+      "AdmitPatientRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "age": {
+            "type": "integer",
+            "maximum": 150.0,
+            "minimum": 0.0,
+            "title": "Age"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "blood_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Group"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "emergency_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emergency Contact"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition"
+          },
+          "triage_score": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Triage Score",
+            "default": 3
+          },
+          "arrival_mode": {
+            "type": "string",
+            "title": "Arrival Mode",
+            "default": "walk_in"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "department": {
+            "type": "string",
+            "title": "Department",
+            "default": "emergency"
+          },
+          "diagnosis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diagnosis"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "default": "moderate"
+          },
+          "bed_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bed Id"
+          },
+          "attending_doctor_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attending Doctor Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "age",
+          "gender",
+          "hospital_id"
+        ],
+        "title": "AdmitPatientRequest",
+        "description": "Combined request to create a patient and admit them in one call."
+      },
+      "AlertResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "alert_type": {
+            "type": "string",
+            "title": "Alert Type"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "acknowledged": {
+            "type": "boolean",
+            "title": "Acknowledged"
+          },
+          "acknowledged_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged By"
+          },
+          "acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged At"
+          },
+          "resolved": {
+            "type": "boolean",
+            "title": "Resolved"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "hospital_id",
+          "alert_type",
+          "severity",
+          "title",
+          "message",
+          "acknowledged",
+          "acknowledged_by",
+          "acknowledged_at",
+          "resolved",
+          "resolved_at",
+          "created_at"
+        ],
+        "title": "AlertResponse"
+      },
+      "AllocationPlan": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "hospital_name": {
+            "type": "string",
+            "title": "Hospital Name"
+          },
+          "prediction_id": {
+            "type": "integer",
+            "title": "Prediction Id"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "overall_risk_level": {
+            "type": "string",
+            "title": "Overall Risk Level"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationRecommendationResponse"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "hospital_name",
+          "prediction_id",
+          "generated_at",
+          "overall_risk_level",
+          "recommendations",
+          "summary"
+        ],
+        "title": "AllocationPlan",
+        "description": "Full allocation plan with all resource recommendations."
+      },
+      "AllocationRecommendationResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "prediction_id": {
+            "type": "integer",
+            "title": "Prediction Id"
+          },
+          "resource_type": {
+            "type": "string",
+            "title": "Resource Type"
+          },
+          "current_available": {
+            "type": "integer",
+            "title": "Current Available"
+          },
+          "recommended_available": {
+            "type": "integer",
+            "title": "Recommended Available"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "priority": {
+            "type": "string",
+            "title": "Priority"
+          },
+          "reasoning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning"
+          },
+          "applied": {
+            "type": "boolean",
+            "title": "Applied"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "prediction_id",
+          "resource_type",
+          "current_available",
+          "recommended_available",
+          "action",
+          "priority",
+          "reasoning",
+          "applied",
+          "created_at"
+        ],
+        "title": "AllocationRecommendationResponse"
+      },
+      "AmbulanceCreate": {
+        "properties": {
+          "vehicle_number": {
+            "type": "string",
+            "title": "Vehicle Number"
+          },
+          "vehicle_type": {
+            "type": "string",
+            "title": "Vehicle Type",
+            "default": "basic"
+          },
+          "driver_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Driver Name"
+          },
+          "paramedic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paramedic Name"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "vehicle_number",
+          "hospital_id"
+        ],
+        "title": "AmbulanceCreate"
+      },
+      "AmbulanceResponse": {
+        "properties": {
+          "vehicle_number": {
+            "type": "string",
+            "title": "Vehicle Number"
+          },
+          "vehicle_type": {
+            "type": "string",
+            "title": "Vehicle Type",
+            "default": "basic"
+          },
+          "driver_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Driver Name"
+          },
+          "paramedic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paramedic Name"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "current_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Lat"
+          },
+          "current_lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Lon"
+          },
+          "destination_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Lat"
+          },
+          "destination_lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Lon"
+          },
+          "destination_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Address"
+          },
+          "eta_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta Minutes"
+          },
+          "last_dispatched_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Dispatched At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "vehicle_number",
+          "id",
+          "hospital_id",
+          "status",
+          "current_lat",
+          "current_lon",
+          "destination_lat",
+          "destination_lon",
+          "destination_address",
+          "eta_minutes",
+          "last_dispatched_at",
+          "created_at"
+        ],
+        "title": "AmbulanceResponse"
+      },
+      "AmbulanceUpdate": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "current_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Lat"
+          },
+          "current_lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Lon"
+          },
+          "destination_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Lat"
+          },
+          "destination_lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Lon"
+          },
+          "destination_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Address"
+          },
+          "eta_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta Minutes"
+          },
+          "driver_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Driver Name"
+          },
+          "paramedic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paramedic Name"
+          }
+        },
+        "type": "object",
+        "title": "AmbulanceUpdate"
+      },
+      "ApplyAllocationRequest": {
+        "properties": {
+          "prediction_id": {
+            "type": "integer",
+            "title": "Prediction Id"
+          },
+          "recommendation_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prediction_id"
+        ],
+        "title": "ApplyAllocationRequest"
+      },
+      "BedGridResponse": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "wards": {
+            "items": {
+              "$ref": "#/components/schemas/WardBedGrid"
+            },
+            "type": "array",
+            "title": "Wards"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds"
+          },
+          "total_available": {
+            "type": "integer",
+            "title": "Total Available"
+          },
+          "total_occupied": {
+            "type": "integer",
+            "title": "Total Occupied"
+          },
+          "total_reserved": {
+            "type": "integer",
+            "title": "Total Reserved"
+          },
+          "total_maintenance": {
+            "type": "integer",
+            "title": "Total Maintenance"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "wards",
+          "total_beds",
+          "total_available",
+          "total_occupied",
+          "total_reserved",
+          "total_maintenance",
+          "generated_at"
+        ],
+        "title": "BedGridResponse",
+        "description": "Full bed grid for a hospital."
+      },
+      "BedReserveRequest": {
+        "properties": {
+          "bed_id": {
+            "type": "integer",
+            "title": "Bed Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "patient_name": {
+            "type": "string",
+            "title": "Patient Name"
+          },
+          "triage_score": {
+            "type": "integer",
+            "title": "Triage Score",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": [
+          "bed_id",
+          "hospital_id",
+          "patient_name"
+        ],
+        "title": "BedReserveRequest",
+        "description": "Request to reserve a specific bed."
+      },
+      "BedReserveResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "reservation_token": {
+            "type": "string",
+            "title": "Reservation Token"
+          },
+          "bed_id": {
+            "type": "integer",
+            "title": "Bed Id"
+          },
+          "bed_number": {
+            "type": "string",
+            "title": "Bed Number"
+          },
+          "ward_name": {
+            "type": "string",
+            "title": "Ward Name"
+          },
+          "ward_type": {
+            "type": "string",
+            "title": "Ward Type"
+          },
+          "bed_type": {
+            "type": "string",
+            "title": "Bed Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "ttl_seconds": {
+            "type": "integer",
+            "title": "Ttl Seconds"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "reservation_token",
+          "bed_id",
+          "bed_number",
+          "ward_name",
+          "ward_type",
+          "bed_type",
+          "status",
+          "expires_at",
+          "ttl_seconds",
+          "message"
+        ],
+        "title": "BedReserveResponse",
+        "description": "Response after a successful bed reservation."
+      },
+      "BedStatusResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "bed_number": {
+            "type": "string",
+            "title": "Bed Number"
+          },
+          "bed_type": {
+            "type": "string",
+            "title": "Bed Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "has_monitor": {
+            "type": "boolean",
+            "title": "Has Monitor"
+          },
+          "has_oxygen": {
+            "type": "boolean",
+            "title": "Has Oxygen"
+          },
+          "ward_id": {
+            "type": "integer",
+            "title": "Ward Id"
+          },
+          "ward_name": {
+            "type": "string",
+            "title": "Ward Name"
+          },
+          "ward_type": {
+            "type": "string",
+            "title": "Ward Type"
+          },
+          "reservation_expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reservation Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "bed_number",
+          "bed_type",
+          "status",
+          "has_monitor",
+          "has_oxygen",
+          "ward_id",
+          "ward_name",
+          "ward_type"
+        ],
+        "title": "BedStatusResponse",
+        "description": "Status of an individual bed in the grid."
+      },
+      "DashboardMetrics": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "period": {
+            "type": "string",
+            "title": "Period"
+          },
+          "admissions_timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimePoint"
+            },
+            "type": "array",
+            "title": "Admissions Timeline",
+            "default": []
+          },
+          "occupancy_timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimePoint"
+            },
+            "type": "array",
+            "title": "Occupancy Timeline",
+            "default": []
+          },
+          "avg_triage_to_bed_minutes": {
+            "type": "number",
+            "title": "Avg Triage To Bed Minutes",
+            "default": 0.0
+          },
+          "avg_length_of_stay_hours": {
+            "type": "number",
+            "title": "Avg Length Of Stay Hours",
+            "default": 0.0
+          },
+          "department_load": {
+            "items": {
+              "$ref": "#/components/schemas/DepartmentLoad"
+            },
+            "type": "array",
+            "title": "Department Load",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "period"
+        ],
+        "title": "DashboardMetrics",
+        "description": "Time-series metrics for charts."
+      },
+      "DashboardOverview": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "hospital_name": {
+            "type": "string",
+            "title": "Hospital Name"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "capacity": {
+            "$ref": "#/components/schemas/HospitalCapacity"
+          },
+          "staff": {
+            "$ref": "#/components/schemas/StaffAvailability"
+          },
+          "fleet": {
+            "$ref": "#/components/schemas/FleetStatus"
+          },
+          "active_alerts": {
+            "items": {
+              "$ref": "#/components/schemas/AlertResponse"
+            },
+            "type": "array",
+            "title": "Active Alerts",
+            "default": []
+          },
+          "critical_alert_count": {
+            "type": "integer",
+            "title": "Critical Alert Count",
+            "default": 0
+          },
+          "warning_alert_count": {
+            "type": "integer",
+            "title": "Warning Alert Count",
+            "default": 0
+          },
+          "surge_predicted": {
+            "type": "boolean",
+            "title": "Surge Predicted",
+            "default": false
+          },
+          "predicted_admissions_next_4h": {
+            "type": "integer",
+            "title": "Predicted Admissions Next 4H",
+            "default": 0
+          },
+          "predicted_admissions_next_12h": {
+            "type": "integer",
+            "title": "Predicted Admissions Next 12H",
+            "default": 0
+          },
+          "prediction_confidence": {
+            "type": "number",
+            "title": "Prediction Confidence",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "hospital_name",
+          "timestamp",
+          "capacity",
+          "staff",
+          "fleet"
+        ],
+        "title": "DashboardOverview",
+        "description": "Top-level dashboard view combining all key metrics."
+      },
+      "DepartmentLoad": {
+        "properties": {
+          "department": {
+            "type": "string",
+            "title": "Department"
+          },
+          "current_patients": {
+            "type": "integer",
+            "title": "Current Patients"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "utilization": {
+            "type": "number",
+            "title": "Utilization"
+          }
+        },
+        "type": "object",
+        "required": [
+          "department",
+          "current_patients",
+          "capacity",
+          "utilization"
+        ],
+        "title": "DepartmentLoad"
+      },
+      "DischargeRequest": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "DischargeRequest"
+      },
+      "DispatchRequest": {
+        "properties": {
+          "destination_lat": {
+            "type": "number",
+            "title": "Destination Lat"
+          },
+          "destination_lon": {
+            "type": "number",
+            "title": "Destination Lon"
+          },
+          "destination_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Address"
+          },
+          "eta_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "destination_lat",
+          "destination_lon"
+        ],
+        "title": "DispatchRequest"
+      },
+      "EventCreateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "example": "City Marathon 2026"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "example": "sports"
+          },
+          "expected_attendance": {
+            "type": "integer",
+            "minimum": 100.0,
+            "title": "Expected Attendance",
+            "example": 25000
+          },
+          "radius_km": {
+            "type": "number",
+            "minimum": 0.5,
+            "title": "Radius Km",
+            "default": 5.0,
+            "example": 5.0
+          },
+          "risk_level": {
+            "type": "string",
+            "title": "Risk Level",
+            "default": "medium",
+            "example": "medium"
+          },
+          "impact_multiplier": {
+            "type": "number",
+            "maximum": 2.5,
+            "minimum": 1.0,
+            "title": "Impact Multiplier",
+            "default": 1.2,
+            "example": 1.25
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "expected_attendance"
+        ],
+        "title": "EventCreateRequest"
+      },
+      "FleetStatus": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "total_ambulances": {
+            "type": "integer",
+            "title": "Total Ambulances"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "dispatched": {
+            "type": "integer",
+            "title": "Dispatched"
+          },
+          "en_route": {
+            "type": "integer",
+            "title": "En Route"
+          },
+          "at_scene": {
+            "type": "integer",
+            "title": "At Scene"
+          },
+          "returning": {
+            "type": "integer",
+            "title": "Returning"
+          },
+          "maintenance": {
+            "type": "integer",
+            "title": "Maintenance"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "total_ambulances",
+          "available",
+          "dispatched",
+          "en_route",
+          "at_scene",
+          "returning",
+          "maintenance"
+        ],
+        "title": "FleetStatus"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HospitalCapacity": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "hospital_name": {
+            "type": "string",
+            "title": "Hospital Name"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds"
+          },
+          "occupied_beds": {
+            "type": "integer",
+            "title": "Occupied Beds"
+          },
+          "available_beds": {
+            "type": "integer",
+            "title": "Available Beds"
+          },
+          "occupancy_rate": {
+            "type": "number",
+            "title": "Occupancy Rate"
+          },
+          "icu_total": {
+            "type": "integer",
+            "title": "Icu Total"
+          },
+          "icu_available": {
+            "type": "integer",
+            "title": "Icu Available"
+          },
+          "emergency_total": {
+            "type": "integer",
+            "title": "Emergency Total"
+          },
+          "emergency_available": {
+            "type": "integer",
+            "title": "Emergency Available"
+          },
+          "ventilator_total": {
+            "type": "integer",
+            "title": "Ventilator Total"
+          },
+          "ventilator_available": {
+            "type": "integer",
+            "title": "Ventilator Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "hospital_name",
+          "total_beds",
+          "occupied_beds",
+          "available_beds",
+          "occupancy_rate",
+          "icu_total",
+          "icu_available",
+          "emergency_total",
+          "emergency_available",
+          "ventilator_total",
+          "ventilator_available"
+        ],
+        "title": "HospitalCapacity"
+      },
+      "HospitalCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "city": {
+            "type": "string",
+            "title": "City",
+            "default": "Bangalore"
+          },
+          "state": {
+            "type": "string",
+            "title": "State",
+            "default": "Karnataka"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds",
+            "default": 100
+          },
+          "icu_beds": {
+            "type": "integer",
+            "title": "Icu Beds",
+            "default": 20
+          },
+          "emergency_beds": {
+            "type": "integer",
+            "title": "Emergency Beds",
+            "default": 15
+          },
+          "ventilator_beds": {
+            "type": "integer",
+            "title": "Ventilator Beds",
+            "default": 10
+          },
+          "tier": {
+            "type": "string",
+            "title": "Tier",
+            "default": "secondary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "address"
+        ],
+        "title": "HospitalCreate"
+      },
+      "HospitalDetail": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "city": {
+            "type": "string",
+            "title": "City",
+            "default": "Bangalore"
+          },
+          "state": {
+            "type": "string",
+            "title": "State",
+            "default": "Karnataka"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds",
+            "default": 100
+          },
+          "icu_beds": {
+            "type": "integer",
+            "title": "Icu Beds",
+            "default": 20
+          },
+          "emergency_beds": {
+            "type": "integer",
+            "title": "Emergency Beds",
+            "default": 15
+          },
+          "ventilator_beds": {
+            "type": "integer",
+            "title": "Ventilator Beds",
+            "default": 10
+          },
+          "tier": {
+            "type": "string",
+            "title": "Tier",
+            "default": "secondary"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "wards": {
+            "items": {
+              "$ref": "#/components/schemas/WardSummary"
+            },
+            "type": "array",
+            "title": "Wards",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "id",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "HospitalDetail"
+      },
+      "HospitalResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "city": {
+            "type": "string",
+            "title": "City",
+            "default": "Bangalore"
+          },
+          "state": {
+            "type": "string",
+            "title": "State",
+            "default": "Karnataka"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds",
+            "default": 100
+          },
+          "icu_beds": {
+            "type": "integer",
+            "title": "Icu Beds",
+            "default": 20
+          },
+          "emergency_beds": {
+            "type": "integer",
+            "title": "Emergency Beds",
+            "default": 15
+          },
+          "ventilator_beds": {
+            "type": "integer",
+            "title": "Ventilator Beds",
+            "default": 10
+          },
+          "tier": {
+            "type": "string",
+            "title": "Tier",
+            "default": "secondary"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "id",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "HospitalResponse"
+      },
+      "HospitalUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "total_beds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Beds"
+          },
+          "icu_beds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icu Beds"
+          },
+          "emergency_beds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emergency Beds"
+          },
+          "ventilator_beds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ventilator Beds"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          }
+        },
+        "type": "object",
+        "title": "HospitalUpdate"
+      },
+      "IncidentCreateRequest": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "example": "Expressway Bus Collision"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "default": "critical",
+            "example": "critical"
+          },
+          "estimated_casualties": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Estimated Casualties",
+            "example": 12
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "estimated_casualties"
+        ],
+        "title": "IncidentCreateRequest"
+      },
+      "PatientResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "age": {
+            "type": "integer",
+            "maximum": 150.0,
+            "minimum": 0.0,
+            "title": "Age"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "blood_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Group"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "emergency_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emergency Contact"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition"
+          },
+          "triage_score": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Triage Score",
+            "default": 3
+          },
+          "arrival_mode": {
+            "type": "string",
+            "title": "Arrival Mode",
+            "default": "walk_in"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "arrival_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Arrival Time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "age",
+          "gender",
+          "id",
+          "arrival_time",
+          "created_at"
+        ],
+        "title": "PatientResponse"
+      },
+      "PredictionHistory": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "predicted_for": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Predicted For"
+          },
+          "predicted_total_admissions": {
+            "type": "integer",
+            "title": "Predicted Total Admissions"
+          },
+          "actual_total_admissions": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Total Admissions"
+          },
+          "confidence_score": {
+            "type": "number",
+            "title": "Confidence Score"
+          },
+          "accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "hospital_id",
+          "predicted_for",
+          "predicted_total_admissions",
+          "actual_total_admissions",
+          "confidence_score",
+          "created_at"
+        ],
+        "title": "PredictionHistory"
+      },
+      "PredictionRequest": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "horizon_hours": {
+            "type": "integer",
+            "title": "Horizon Hours",
+            "default": 4
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id"
+        ],
+        "title": "PredictionRequest"
+      },
+      "PredictionResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "predicted_for": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Predicted For"
+          },
+          "horizon_hours": {
+            "type": "integer",
+            "title": "Horizon Hours"
+          },
+          "predicted_total_admissions": {
+            "type": "integer",
+            "title": "Predicted Total Admissions"
+          },
+          "predicted_emergency_admissions": {
+            "type": "integer",
+            "title": "Predicted Emergency Admissions"
+          },
+          "predicted_icu_demand": {
+            "type": "integer",
+            "title": "Predicted Icu Demand"
+          },
+          "predicted_surgical_demand": {
+            "type": "integer",
+            "title": "Predicted Surgical Demand"
+          },
+          "confidence_score": {
+            "type": "number",
+            "title": "Confidence Score"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
+          "is_surge_predicted": {
+            "type": "boolean",
+            "title": "Is Surge Predicted"
+          },
+          "features_used": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Features Used"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "hospital_id",
+          "predicted_for",
+          "horizon_hours",
+          "predicted_total_admissions",
+          "predicted_emergency_admissions",
+          "predicted_icu_demand",
+          "predicted_surgical_demand",
+          "confidence_score",
+          "model_version",
+          "is_surge_predicted",
+          "features_used",
+          "created_at"
+        ],
+        "title": "PredictionResponse"
+      },
+      "StaffAvailability": {
+        "properties": {
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "total_staff": {
+            "type": "integer",
+            "title": "Total Staff"
+          },
+          "on_duty": {
+            "type": "integer",
+            "title": "On Duty"
+          },
+          "off_duty": {
+            "type": "integer",
+            "title": "Off Duty"
+          },
+          "doctors_on_duty": {
+            "type": "integer",
+            "title": "Doctors On Duty"
+          },
+          "nurses_on_duty": {
+            "type": "integer",
+            "title": "Nurses On Duty"
+          },
+          "paramedics_on_duty": {
+            "type": "integer",
+            "title": "Paramedics On Duty"
+          },
+          "staff_to_patient_ratio": {
+            "type": "number",
+            "title": "Staff To Patient Ratio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "total_staff",
+          "on_duty",
+          "off_duty",
+          "doctors_on_duty",
+          "nurses_on_duty",
+          "paramedics_on_duty",
+          "staff_to_patient_ratio"
+        ],
+        "title": "StaffAvailability"
+      },
+      "StaffCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "employee_id": {
+            "type": "string",
+            "title": "Employee Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "specialization": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialization"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "current_shift": {
+            "type": "string",
+            "title": "Current Shift",
+            "default": "off"
+          },
+          "max_patients": {
+            "type": "integer",
+            "title": "Max Patients",
+            "default": 10
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "employee_id",
+          "role",
+          "hospital_id"
+        ],
+        "title": "StaffCreate"
+      },
+      "StaffResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "employee_id": {
+            "type": "string",
+            "title": "Employee Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "specialization": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialization"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "current_shift": {
+            "type": "string",
+            "title": "Current Shift",
+            "default": "off"
+          },
+          "max_patients": {
+            "type": "integer",
+            "title": "Max Patients",
+            "default": 10
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          },
+          "on_duty": {
+            "type": "boolean",
+            "title": "On Duty"
+          },
+          "is_available": {
+            "type": "boolean",
+            "title": "Is Available"
+          },
+          "current_patients": {
+            "type": "integer",
+            "title": "Current Patients"
+          },
+          "shift_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shift Start"
+          },
+          "shift_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shift End"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "employee_id",
+          "role",
+          "id",
+          "hospital_id",
+          "on_duty",
+          "is_available",
+          "current_patients",
+          "shift_start",
+          "shift_end",
+          "is_active",
+          "created_at"
+        ],
+        "title": "StaffResponse"
+      },
+      "StaffUpdate": {
+        "properties": {
+          "current_shift": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Shift"
+          },
+          "on_duty": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On Duty"
+          },
+          "is_available": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Available"
+          },
+          "shift_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shift Start"
+          },
+          "shift_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shift End"
+          },
+          "current_patients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Patients"
+          }
+        },
+        "type": "object",
+        "title": "StaffUpdate"
+      },
+      "TimePoint": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "value"
+        ],
+        "title": "TimePoint"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WardBedGrid": {
+        "properties": {
+          "ward_id": {
+            "type": "integer",
+            "title": "Ward Id"
+          },
+          "ward_name": {
+            "type": "string",
+            "title": "Ward Name"
+          },
+          "ward_type": {
+            "type": "string",
+            "title": "Ward Type"
+          },
+          "floor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floor"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds"
+          },
+          "available_beds": {
+            "type": "integer",
+            "title": "Available Beds"
+          },
+          "beds": {
+            "items": {
+              "$ref": "#/components/schemas/BedStatusResponse"
+            },
+            "type": "array",
+            "title": "Beds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ward_id",
+          "ward_name",
+          "ward_type",
+          "floor",
+          "total_beds",
+          "available_beds",
+          "beds"
+        ],
+        "title": "WardBedGrid",
+        "description": "All beds in a single ward."
+      },
+      "WardCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "ward_type": {
+            "type": "string",
+            "title": "Ward Type",
+            "default": "general"
+          },
+          "floor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floor"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds",
+            "default": 20
+          },
+          "available_beds": {
+            "type": "integer",
+            "title": "Available Beds",
+            "default": 20
+          },
+          "hospital_id": {
+            "type": "integer",
+            "title": "Hospital Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "hospital_id"
+        ],
+        "title": "WardCreate"
+      },
+      "WardSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "ward_type": {
+            "type": "string",
+            "title": "Ward Type"
+          },
+          "total_beds": {
+            "type": "integer",
+            "title": "Total Beds"
+          },
+          "available_beds": {
+            "type": "integer",
+            "title": "Available Beds"
+          },
+          "occupancy_rate": {
+            "type": "number",
+            "title": "Occupancy Rate",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "ward_type",
+          "total_beds",
+          "available_beds"
+        ],
+        "title": "WardSummary"
+      }
+    }
+  }
+}

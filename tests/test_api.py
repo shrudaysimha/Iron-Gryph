@@ -21,14 +21,16 @@ def test_health_check():
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert "MedCore Surge AI" in response.text
+    data = response.json()
+    assert "Hospital Surge AI" in data["message"]
+    assert "endpoints" in data
 
     # Verify JSON API info endpoint
     info_resp = client.get("/api/info")
     assert info_resp.status_code == 200
-    data = info_resp.json()
-    assert "endpoints" in data
-    assert data["version"] == "1.0.0"
+    info_data = info_resp.json()
+    assert "endpoints" in info_data
+    assert info_data["version"] == "1.0.0"
 
 
 
@@ -116,3 +118,57 @@ def test_environment_events():
     data = response.json()
     assert "has_local_event" in data
     assert "event_surge_multiplier" in data
+
+
+def test_bed_grid_and_reservation_flow():
+    # 1. Fetch live bed grid
+    grid_res = client.get("/api/v1/beds/grid?hospital_id=1")
+    assert grid_res.status_code == 200
+    grid = grid_res.json()
+    assert grid["hospital_id"] == 1
+    assert "wards" in grid
+    assert len(grid["wards"]) > 0
+
+    # Find an available bed
+    target_bed = None
+    for ward in grid["wards"]:
+        for bed in ward["beds"]:
+            if bed["status"] == "available":
+                target_bed = bed
+                break
+        if target_bed:
+            break
+
+    assert target_bed is not None, "At least one bed should be available in seeded db"
+
+    # 2. Reserve the bed
+    reserve_payload = {
+        "bed_id": target_bed["id"],
+        "hospital_id": 1,
+        "patient_name": "Test Emergency Patient",
+        "triage_score": 1,
+    }
+    res_1 = client.post("/api/v1/beds/reserve", json=reserve_payload)
+    assert res_1.status_code == 200
+    res_data = res_1.json()
+    assert res_data["success"] is True
+    assert res_data["status"] == "reserved"
+    token = res_data["reservation_token"]
+
+    # 3. Simulate concurrency collision: Second user attempts to reserve the same bed
+    res_2 = client.post("/api/v1/beds/reserve", json={
+        "bed_id": target_bed["id"],
+        "hospital_id": 1,
+        "patient_name": "Concurrent Conflicting Patient",
+        "triage_score": 2,
+    })
+    assert res_2.status_code == 409
+    conflict_detail = res_2.json()["detail"]
+    assert conflict_detail["error"] == "bed_unavailable"
+    assert "alternative_beds" in conflict_detail
+
+    # 4. Release reservation
+    release_res = client.post(f"/api/v1/beds/release?bed_id={target_bed['id']}&reservation_token={token}")
+    assert release_res.status_code == 200
+    assert release_res.json()["status"] == "available"
+

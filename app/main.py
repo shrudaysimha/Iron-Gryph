@@ -177,18 +177,6 @@ async def websocket_alerts_hospital(websocket: WebSocket, hospital_id: int):
     except WebSocketDisconnect:
         alert_manager.disconnect(websocket, hospital_id=hospital_id)
 
-
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
-STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-STATIC_DIR.mkdir(parents=True, exist_ok=True)
-
-# Mount static assets
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
-
 # ---- Health & Root Endpoints ----
 
 @app.get("/health", tags=["System"])
@@ -212,32 +200,39 @@ def health_check():
     }
 
 
-@app.get("/", include_in_schema=False)
-def serve_frontend():
-    """Serve the Hospital Surge AI Emergency Command Center."""
-    index_file = STATIC_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
+@app.get("/", tags=["System"])
+def root():
+    """API root endpoint providing status and documentation links."""
     return get_api_info()
 
 
 @app.get("/api/info", tags=["System"])
 def get_api_info():
-    """Root info endpoint."""
+    """Root info endpoint detailing all active API routes and documentation."""
     return {
         "message": "Hospital Surge AI API is running",
         "version": "1.0.0",
         "docs": "/docs",
         "redoc": "/redoc",
+        "openapi": "/openapi.json",
         "endpoints": {
             "dashboard": "/api/v1/dashboard/overview?hospital_id=1",
             "hospitals": "/api/v1/hospitals/",
+            "hospital_capacity": "/api/v1/hospitals/1/capacity",
+            "beds_grid": "/api/v1/beds/grid?hospital_id=1",
+            "beds_reserve": "/api/v1/beds/reserve",
+            "beds_confirm": "/api/v1/beds/confirm",
+            "beds_release": "/api/v1/beds/release",
             "patients": "/api/v1/patients/current?hospital_id=1",
             "staff": "/api/v1/staff/on-duty?hospital_id=1",
             "ambulances": "/api/v1/ambulances/?hospital_id=1",
-            "predictions": "/api/v1/predictions/demand?hospital_id=1",
+            "predictions_generate": "/api/v1/predictions/generate",
+            "predictions_demand": "/api/v1/predictions/demand?hospital_id=1",
             "allocations": "/api/v1/allocations/recommend?hospital_id=1",
             "alerts": "/api/v1/alerts/?hospital_id=1",
+            "environment_weather": "/api/v1/environment/weather",
+            "environment_events": "/api/v1/environment/events?hospital_id=1",
             "ws_alerts": "/ws/alerts",
+            "ws_alerts_hospital": "/ws/alerts/{hospital_id}",
         },
     }
