@@ -25,6 +25,7 @@ source .venv/bin/activate
 # Launch on port 8080
 uvicorn legal_system.app.main:app --host 0.0.0.0 --port 8080 --reload
 ```
+- **Web Application UI**: [http://localhost:8080](http://localhost:8080) (Modern zero-login interface with instant persona switching, SHA-256 seals, and tamper lab)
 - **Interactive Swagger Docs**: [http://localhost:8080/docs](http://localhost:8080/docs)
 - **ReDoc Specification**: [http://localhost:8080/redoc](http://localhost:8080/redoc)
 
@@ -92,6 +93,10 @@ Iron-Gryph/
 │   │   ├── schemas.py          # Pydantic v2 schemas
 │   │   ├── seed.py             # Pre-seeded cases, exhibits, audit records
 │   │   └── main.py             # FastAPI entrypoint
+│   ├── static/                 # Modern Zero-Login UI (Tailwind + Lucide)
+│   │   ├── index.html          # Bento dashboard, tamper lab & exhibit viewer
+│   │   ├── style.css           # Glass-effect & green/red cryptographic seals
+│   │   └── app.js              # Client WebCrypto & live SHA-256 verification
 │   └── README.md               # Legal system & mobile integration guide
 ├── refrence/                   # UI reference templates
 ├── tests/

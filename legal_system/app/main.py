@@ -61,6 +61,13 @@ app.include_router(evidence.router, prefix=api_prefix)
 app.include_router(audit.router, prefix=api_prefix)
 
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+
 @app.get("/health", tags=["System"])
 def health_check():
     """System liveness and cryptographic module status."""
@@ -73,13 +80,20 @@ def health_check():
     }
 
 
+# Mount static assets for frontend
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
 @app.get("/", include_in_schema=False)
-def root():
-    """Root entrypoint returning API metadata."""
+def serve_frontend():
+    """Serve the single-page application frontend."""
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
     return JSONResponse(
         {
-            "service": settings.PROJECT_NAME,
-            "version": "1.0.0",
+            "service": settings.app_name,
+            "version": settings.app_version,
             "status": "online",
             "api_docs": "/docs",
             "redoc": "/redoc",
