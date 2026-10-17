@@ -178,6 +178,17 @@ async def websocket_alerts_hospital(websocket: WebSocket, hospital_id: int):
         alert_manager.disconnect(websocket, hospital_id=hospital_id)
 
 
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static assets
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
 # ---- Health & Root Endpoints ----
 
 @app.get("/health", tags=["System"])
@@ -201,8 +212,17 @@ def health_check():
     }
 
 
-@app.get("/", tags=["System"])
-def root():
+@app.get("/", include_in_schema=False)
+def serve_frontend():
+    """Serve the Hospital Surge AI Emergency Command Center."""
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return get_api_info()
+
+
+@app.get("/api/info", tags=["System"])
+def get_api_info():
     """Root info endpoint."""
     return {
         "message": "Hospital Surge AI API is running",

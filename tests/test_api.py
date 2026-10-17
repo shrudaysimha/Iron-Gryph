@@ -21,9 +21,15 @@ def test_health_check():
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    data = response.json()
+    assert "MedCore Surge AI" in response.text
+
+    # Verify JSON API info endpoint
+    info_resp = client.get("/api/info")
+    assert info_resp.status_code == 200
+    data = info_resp.json()
     assert "endpoints" in data
     assert data["version"] == "1.0.0"
+
 
 
 def test_list_hospitals():
