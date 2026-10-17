@@ -17,6 +17,7 @@ from legal_system.app.audit_service import log_audit_event
 router = APIRouter(prefix="/cases", tags=["Case Management"])
 
 
+@router.get("", response_model=List[CaseResponse], include_in_schema=False)
 @router.get("/", response_model=List[CaseResponse])
 def list_cases(
     status_filter: Optional[str] = Query(None, alias="status"),

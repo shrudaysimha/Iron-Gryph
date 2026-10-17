@@ -13,6 +13,8 @@ from legal_system.app.auth import require_admin
 router = APIRouter(prefix="/audit", tags=["Audit Log & Chain of Custody (Admin Only)"])
 
 
+@router.get("", response_model=List[AuditLogResponse], include_in_schema=False)
+@router.get("/logs", response_model=List[AuditLogResponse], include_in_schema=False)
 @router.get("/", response_model=List[AuditLogResponse])
 def get_audit_trail(
     action: Optional[str] = None,
