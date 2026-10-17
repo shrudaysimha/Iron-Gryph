@@ -15,8 +15,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
 
 from legal_system.app.config import settings
 from legal_system.app.database import init_db
@@ -24,9 +23,6 @@ from legal_system.app.seed import seed_legal_data
 from legal_system.app.routers import auth, cases, evidence, audit
 
 logger = logging.getLogger("legal_vault")
-
-STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @asynccontextmanager
@@ -77,19 +73,21 @@ def health_check():
     }
 
 
-# Mount static assets for frontend
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
-
 @app.get("/", include_in_schema=False)
-def serve_frontend():
-    """Serve the single-page application frontend."""
-    index_file = STATIC_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
+def root():
+    """Root entrypoint returning API metadata."""
     return JSONResponse(
         {
-            "message": "Legal & Investigation Document Management API is active.",
-            "docs": "/docs",
+            "service": settings.PROJECT_NAME,
+            "version": "1.0.0",
+            "status": "online",
+            "api_docs": "/docs",
+            "redoc": "/redoc",
+            "endpoints": {
+                "auth": "/api/v1/auth",
+                "cases": "/api/v1/cases",
+                "evidence": "/api/v1/evidence",
+                "audit": "/api/v1/audit",
+            },
         }
     )

@@ -25,7 +25,6 @@ source .venv/bin/activate
 # Launch on port 8080
 uvicorn legal_system.app.main:app --host 0.0.0.0 --port 8080 --reload
 ```
-- **Web App**: [http://localhost:8080](http://localhost:8080)
 - **Interactive Swagger Docs**: [http://localhost:8080/docs](http://localhost:8080/docs)
 - **ReDoc Specification**: [http://localhost:8080/redoc](http://localhost:8080/redoc)
 
@@ -72,10 +71,6 @@ Iron-Gryph/
 │   │   ├── schemas.py          # Pydantic v2 schemas
 │   │   ├── seed.py             # Pre-seeded cases, exhibits, audit records
 │   │   └── main.py             # FastAPI entrypoint
-│   ├── static/
-│   │   ├── index.html          # Modern obsidian zero-login dashboard
-│   │   ├── style.css           # Glassmorphic dark styling & badges
-│   │   └── app.js              # Client logic & WebCrypto hashing
 │   └── README.md               # Legal system & mobile integration guide
 ├── app/                        # Hospital Surge Prediction & Resource AI
 │   ├── api/v1/                 # Endpoints (hospitals, patients, predictions, staff)
