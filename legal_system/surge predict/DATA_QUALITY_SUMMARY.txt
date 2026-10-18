@@ -1,0 +1,25 @@
+DATA QUALITY SUMMARY
+====================
+Workbook: Supplementary+file+1.xlsx
+Rows in exported hourly calendar: 35064
+First timestamp: 2014-01-01 00:00:00
+Last timestamp: 2017-12-31 23:00:00
+Status counts: {'observed_count': 31973, 'blank_hour_assumed_zero': 2011, 'date_not_in_pivot': 792, 'day_missing_in_pivot': 288}
+Date labels in pivot: 357
+Years mapped: [2014, 2015, 2016, 2017]
+Available daily totals checked: 1416
+Daily totals missing in the year block: 12
+Daily aggregate / hourly sum mismatches: 0
+
+Status meanings:
+- observed_count: numeric value read from the matching hour cell.
+- blank_hour_assumed_zero: hour cell blank, but that date's daily aggregate exists and
+  blank-as-zero hourly sums were verified against that aggregate.
+- day_missing_in_pivot: date header exists but this year's daily total is blank; hours
+  are unknown and left blank.
+- date_not_in_pivot: the date/month combination is absent from the pivot's columns;
+  hours are unknown and left blank.
+
+Caution: The Dryad description states Jan 2014-Aug 2017, while the workbook has
+nonblank values under the 2017 block for Sep-Dec. Verify this discrepancy.
+Source: https://datadryad.org/dataset/doi:10.5061/dryad.q57d4g4

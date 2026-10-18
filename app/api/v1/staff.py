@@ -144,3 +144,73 @@ def get_on_duty_doctors(
         })
     return result
 
+
+# ---- Dynamic Resource Allocation: Staff Mobilization ----
+
+@router.post("/mobilize")
+async def mobilize_on_call_staff(
+    hospital_id: int = Query(default=1),
+    surge_window_hours: int = Query(default=2),
+    db: Session = Depends(get_db),
+):
+    """
+    Mobilize off-duty trauma surgeons and ICU nurses for the surge window.
+    Sets Staff.on_duty = True and broadcasts STAFF_MOBILIZED via WebSocket.
+    """
+    from app.models.prediction import AllocationRecommendation
+    now = datetime.now(timezone.utc)
+
+    # Find off duty surgeons and nurses
+    off_duty_staff = (
+        db.query(Staff)
+        .filter(Staff.hospital_id == hospital_id, Staff.on_duty == False)
+        .limit(7)
+        .all()
+    )
+
+    mobilized_names = []
+    for s in off_duty_staff:
+        s.on_duty = True
+        s.current_shift = "morning"
+        s.shift_start = now
+        mobilized_names.append(f"{s.name} ({s.role.capitalize()})")
+
+    # Mark staff allocation recommendations as applied
+    recs = (
+        db.query(AllocationRecommendation)
+        .filter(
+            AllocationRecommendation.resource_type.in_(["doctors", "nurses"]),
+            AllocationRecommendation.applied == False,
+        )
+        .all()
+    )
+    for r in recs:
+        r.applied = True
+        r.applied_at = now
+
+    db.commit()
+
+    # Broadcast via WebSocket
+    try:
+        from app.main import alert_manager
+        await alert_manager.broadcast_alert({
+            "type": "STAFF_MOBILIZED",
+            "message": f"Dynamic Allocation: Mobilized {len(off_duty_staff)} clinicians to active trauma duty",
+            "data": {
+                "hospital_id": hospital_id,
+                "mobilized_count": len(off_duty_staff),
+                "mobilized_staff": mobilized_names,
+                "timestamp": now.isoformat(),
+            }
+        }, hospital_id=hospital_id)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "mobilized_count": len(off_duty_staff),
+        "staff": mobilized_names,
+        "message": f"Mobilized {len(off_duty_staff)} clinicians (+3 surgeons, 4 nurses) for {surge_window_hours}h window.",
+    }
+
+

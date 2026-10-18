@@ -126,11 +126,11 @@ def seed_legal_data():
         evidence_samples = [
             {
                 "case": case1,
-                "title": "SWIFT Interbank Transfer Logs (994-AZ)",
-                "description": "Authenticated offshore wire transmission telemetry showing transaction routing from Cayman to Zurich.",
-                "category": "Financial Record",
-                "filename": "swift_transfer_logs_batch_994az.pdf",
-                "content": b"%PDF-1.4 [SECURED EXHIBIT: SWIFT Wire Transfer #994-AZ - Authenticated by Interbank Security Audit]",
+                "title": "Trauma Admission & EMS Field Telemetry (Run #994-AZ)",
+                "description": "Authenticated paramedic field transmission telemetry showing vital sign deterioration during highway multi-trauma transport.",
+                "category": "Medical Forensic Record",
+                "filename": "trauma_ems_telemetry_batch_994az.pdf",
+                "content": b"%PDF-1.4 [SECURED EXHIBIT: Trauma Admission & EMS Telemetry #994-AZ - Authenticated by Emergency Medicine Forensic Seal]",
                 "uploader": inv1,
             },
             {
@@ -240,7 +240,7 @@ def seed_legal_data():
                 action="VERIFY_HASH_VALID",
                 resource_type="Evidence",
                 resource_id="CASE-2026-1042",
-                details="Routine chain-of-custody verification: SWIFT Interbank Transfer Logs hash verified against canonical ledger.",
+                details="Routine chain-of-custody verification: Trauma Admission & EMS Field Telemetry hash verified against canonical ledger.",
                 sha256_snapshot="d5b78c93...",
                 ip_address="192.168.1.104",
             ),

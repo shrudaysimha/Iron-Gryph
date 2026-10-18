@@ -66,3 +66,53 @@ class BedGridResponse(BaseModel):
     total_reserved: int
     total_maintenance: int
     generated_at: datetime
+
+
+# ---- Voice-Enabled Bed Reservation & Hospital Contact Schemas ----
+from typing import Any, Dict, List
+from pydantic import Field
+
+
+class VerifiedStaffProfile(BaseModel):
+    """Pre-verified user profile passed from authenticated clinical session."""
+    employee_id: str | None = Field(default="EMP-1005", description="Verified Employee/Badge ID")
+    name: str | None = Field(default="Dr. Rajiv Mehta", description="Physician / Clinician Full Name")
+    role: str | None = Field(default="doctor", description="Role cadre: doctor, nurse, paramedic, admin")
+    title: str | None = Field(default="Chief Trauma Surgeon & Medical Director", description="Clinical Title")
+    department: str | None = Field(default="Emergency Trauma & Surgical ICU", description="Hospital Department")
+    hospital: str | None = Field(default="SIDS Hospital Surat", description="Hospital Station Base")
+    specialization: str | None = Field(default="Trauma & Critical Care", description="Specialization")
+
+
+class VoiceBedContactRequest(BaseModel):
+    """Voice command payload to contact hospital and reserve bed."""
+    audio_transcript: str = Field(..., description="Spoken voice directive transcription")
+    hospital_id: int = Field(default=1, description="Target Hospital ID")
+    staff_profile: VerifiedStaffProfile | None = Field(default=None, description="Pre-verified staff profile")
+    target_bed_id: str | None = Field(default=None, description="Optional explicit bed identifier")
+
+
+class ClinicalVoiceAnalysis(BaseModel):
+    """Entities and clinical triage extracted by the voice processing model."""
+    intent: str
+    acuity_level: str
+    triage_score: int
+    urgency: str
+    target_ward_type: str
+    patient_condition: str
+    equipment_needed: List[str]
+    requires_ventilator: bool
+    requires_oxygen: bool
+    eta_minutes: int | None = 5
+    extracted_bed_number: str | None = None
+
+
+class VoiceBedContactResponse(BaseModel):
+    """Structured response from voice processing model and atomic bed lock."""
+    success: bool
+    transcription_processed: str
+    model_analysis: ClinicalVoiceAnalysis
+    verified_staff: Dict[str, Any]
+    reservation: Dict[str, Any] | None = None
+    speech_feedback: str
+    message: str

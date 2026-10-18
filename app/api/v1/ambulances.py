@@ -270,3 +270,74 @@ def dispatch_emergency(
         },
     }
 
+
+# ---- Dynamic Resource Allocation: Ambulance Re-routing ----
+
+@router.post("/reroute")
+async def reroute_non_critical_ems(
+    hospital_id: int = Query(default=1),
+    target_facility: str = Query(default="Satellite Hospital B - West Ward"),
+    db: Session = Depends(get_db),
+):
+    """
+    Re-route incoming non-critical ambulances to secondary facilities to preserve ED capacity.
+    Updates Ambulance models and broadcasts EMS_REROUTED via WebSocket.
+    """
+    from app.models.prediction import AllocationRecommendation
+    now = datetime.now(timezone.utc)
+
+    # Find non-critical or dispatched ambulances
+    ambulances = (
+        db.query(Ambulance)
+        .filter(Ambulance.hospital_id == hospital_id)
+        .filter(Ambulance.vehicle_type == "basic")
+        .limit(3)
+        .all()
+    )
+    if not ambulances:
+        ambulances = db.query(Ambulance).filter(Ambulance.hospital_id == hospital_id).limit(2).all()
+
+    rerouted_units = []
+    for amb in ambulances:
+        amb.destination_address = target_facility
+        amb.status = "en_route"
+        rerouted_units.append(amb.vehicle_number)
+
+    # Mark ambulance allocation recommendations as applied
+    recs = (
+        db.query(AllocationRecommendation)
+        .filter(AllocationRecommendation.resource_type == "ambulances", AllocationRecommendation.applied == False)
+        .all()
+    )
+    for r in recs:
+        r.applied = True
+        r.applied_at = now
+
+    db.commit()
+
+    # Broadcast via WebSocket
+    try:
+        from app.main import alert_manager
+        await alert_manager.broadcast_alert({
+            "type": "EMS_REROUTED",
+            "message": f"Dynamic Allocation: Diverted {len(ambulances)} non-critical EMS to {target_facility}",
+            "data": {
+                "hospital_id": hospital_id,
+                "rerouted_count": len(ambulances),
+                "units": rerouted_units,
+                "target_facility": target_facility,
+                "timestamp": now.isoformat(),
+            }
+        }, hospital_id=hospital_id)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "rerouted_count": len(ambulances),
+        "units": rerouted_units,
+        "target_facility": target_facility,
+        "message": f"Re-routed {len(ambulances)} non-critical inbound ambulances to {target_facility}.",
+    }
+
+

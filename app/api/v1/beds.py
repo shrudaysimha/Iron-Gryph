@@ -342,3 +342,114 @@ def _find_alternatives(db: Session, hospital_id: int, ward_type: str, exclude_be
             "ward_name": w.name if w else "Unknown",
         })
     return result
+
+
+# ---- Voice-Enabled Rapid Bed Reservation & Hospital Contact Endpoints ----
+
+from app.schemas.bed_reservation import VoiceBedContactRequest, VoiceBedContactResponse
+from app.ml.voice_hospital_agent import ClinicalVoiceAgentModel
+
+voice_agent_model = ClinicalVoiceAgentModel()
+
+
+@router.post("/voice-reserve", response_model=VoiceBedContactResponse, tags=["Voice Bed Booking"])
+@router.post("/voice-contact", response_model=VoiceBedContactResponse, tags=["Voice Bed Booking"])
+def voice_reserve_bed(
+    request: VoiceBedContactRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Voice-enabled hospital contact and bed reservation endpoint.
+    
+    1. Ingests spoken clinical audio transcription.
+    2. Runs clinical NLP model to analyze patient condition, ESI acuity level,
+       and equipment needs (ventilator, oxygen).
+    3. Merges automatically with the verified clinician/staff profile without manual typing.
+    4. Executes pessimistic row lock on the matching bed and returns 5-minute hold token.
+    5. Returns synthesized voice feedback for audio playback.
+    """
+    _cleanup_expired_reservations(db)
+
+    profile_dict = request.staff_profile.model_dump() if request.staff_profile else None
+    
+    result = voice_agent_model.process_voice_directive(
+        transcript=request.audio_transcript,
+        hospital_id=request.hospital_id,
+        staff_profile=profile_dict,
+        db=db,
+        explicit_bed=request.target_bed_id,
+    )
+    return result
+
+
+# ---- Dynamic Resource Allocation: Bed Conversion ----
+
+@router.post("/convert")
+async def convert_beds(
+    hospital_id: int = Query(default=1),
+    count: int = Query(default=6),
+    ward_type: str = Query(default="stepdown"),
+    db: Session = Depends(get_db),
+):
+    """
+    Dynamically convert beds (e.g. Step-down beds in Ward 3) to High-Flow O2 bays.
+    Updates Bed and Ward models and broadcasts BEDS_CONVERTED via WebSocket.
+    """
+    from app.models.prediction import AllocationRecommendation
+    now = datetime.now(timezone.utc)
+
+    # Find beds to convert
+    query = (
+        db.query(Bed)
+        .join(Ward)
+        .filter(Ward.hospital_id == hospital_id)
+    )
+    if ward_type:
+        query = query.filter(Ward.ward_type.in_([ward_type, "general", "stepdown"]))
+
+    beds = query.limit(count).all()
+    if not beds:
+        beds = db.query(Bed).join(Ward).filter(Ward.hospital_id == hospital_id).limit(count).all()
+
+    converted_ids = []
+    for b in beds:
+        b.has_oxygen = True
+        b.has_monitor = True
+        b.bed_type = "ventilator" if b.bed_type == "general" else b.bed_type
+        converted_ids.append(b.bed_number)
+
+    # Mark bed allocation recommendations as applied
+    recs = (
+        db.query(AllocationRecommendation)
+        .filter(AllocationRecommendation.resource_type == "beds", AllocationRecommendation.applied == False)
+        .all()
+    )
+    for r in recs:
+        r.applied = True
+        r.applied_at = now
+
+    db.commit()
+
+    # Broadcast via WebSocket
+    try:
+        from app.main import alert_manager
+        await alert_manager.broadcast_alert({
+            "type": "BEDS_CONVERTED",
+            "message": f"Dynamic Allocation: {len(beds)} Step-Down Beds converted to High-Flow O2 bays",
+            "data": {
+                "hospital_id": hospital_id,
+                "converted_count": len(beds),
+                "converted_beds": converted_ids,
+                "timestamp": now.isoformat(),
+            }
+        }, hospital_id=hospital_id)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "converted_count": len(beds),
+        "beds": converted_ids,
+        "message": f"Successfully converted {len(beds)} Step-Down beds to High-Flow O2 bays.",
+    }
+

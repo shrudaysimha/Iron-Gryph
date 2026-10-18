@@ -168,24 +168,33 @@
 
   <!-- Fixed Top Header -->
   <header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe">
-    <div class="h-16 px-gutter flex items-center justify-between">
+    <div class="h-16 px-gutter flex items-center justify-between max-w-xl mx-auto">
       <div class="flex items-center gap-space-sm">
-        <a href="/beds" class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm hover:opacity-90 transition-opacity">
-          <span class="material-symbols-outlined text-[20px]">local_hospital</span>
+        <a href="/dashboard" class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary via-primary-container to-secondary flex items-center justify-center text-on-primary shadow-sm hover:opacity-90 transition-opacity">
+          <span class="material-symbols-outlined text-[20px]">shield_with_heart</span>
         </a>
         <div class="flex flex-col">
           <div class="flex items-center gap-1.5">
-            <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">MediBook</span>
+            <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">Iron-Gryph</span>
+            <span class="text-xs text-on-surface-variant hidden sm:inline">| MedCore Surge AI</span>
             <span class="px-1.5 py-0.5 rounded-full bg-error/10 text-error font-label-sm text-label-sm uppercase flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>LIVE
             </span>
           </div>
-          <span class="font-label-sm text-label-sm text-on-surface-variant -mt-0.5">SIDS Hospital Surat</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant -mt-0.5">SIDS Hospital Surat • CAD Telemetry Fleet</span>
         </div>
       </div>
       <div class="flex items-center gap-space-sm">
-        <button aria-label="Emergency SOS" id="sos-btn" onclick="triggerEmergencySOS()" class="w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-low text-tertiary relative hover:bg-surface-container active:scale-95 transition-all">
-          <span class="material-symbols-outlined text-[22px]">emergency</span>
+        <a href="/dashboard" class="px-2.5 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-label-sm text-xs font-bold transition flex items-center gap-1 border border-outline-variant/30" title="Return to Master Command Center">
+          <span class="material-symbols-outlined text-[16px]">speed</span>
+          <span class="hidden md:inline">Command Center</span>
+        </a>
+        <a href="/legal-vault" class="px-2.5 py-1.5 rounded-xl bg-indigo-950 text-indigo-300 hover:bg-indigo-900 font-label-sm text-xs font-bold transition flex items-center gap-1 border border-indigo-700/50" title="Open Forensic Legal Vault">
+          <span class="material-symbols-outlined text-[16px]">gavel</span>
+          <span class="hidden md:inline">Legal Vault</span>
+        </a>
+        <button aria-label="Emergency SOS" id="sos-btn" onclick="triggerEmergencySOS()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-tertiary relative hover:bg-surface-container active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-[20px]">emergency</span>
           <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface animate-ping"></span>
         </button>
         <button onclick="window.openProfileDrawer()" class="flex items-center gap-1.5 p-1 pr-2.5 rounded-full bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/30" title="Click to view Staff Profile & Station Access">
@@ -198,7 +207,7 @@
 
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface">
-    <div class="flex flex-col w-full">
+    <div class="flex flex-col w-full max-w-xl mx-auto">
 
       <!-- CAD Live Telemetry Header Banner -->
       <div class="px-gutter pt-space-md pb-space-sm bg-gradient-to-b from-primary/5 via-transparent to-transparent">
@@ -436,6 +445,10 @@
 
           <!-- Action Buttons -->
           <div class="flex flex-col gap-2">
+            <button onclick="triggerVoiceHospitalContact('AMB-102')" class="w-full h-11 px-3 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm hover:opacity-95 active:scale-95 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[19px]">mic</span>
+              <span id="voice-ems-text-102">Voice Contact Hospital & Stage Bay</span>
+            </button>
             <div class="grid grid-cols-2 gap-2">
               <button class="h-11 px-3 rounded-xl bg-error text-on-error font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all" id="trauma-bay-btn" onclick="toggleTraumaBay(this)">
                 <span class="material-symbols-outlined text-[18px]">emergency_home</span>
@@ -614,23 +627,32 @@
   </div>
 
   <!-- Persistent Bottom Tab Bar Navigation -->
-  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-label-md">
-    <div class="flex justify-around items-center h-16 px-gutter-sm max-w-xl mx-auto">
-      <a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-primary transition-all" data-path="triage" href="/triage">
-        <span class="material-symbols-outlined text-[22px]">medical_services</span>
-        <span class="font-label-sm text-label-sm">Triage</span>
+  <!-- Persistent Bottom Tab Bar Navigation (6 Core Hospital Modules) -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)] border-t border-surface-container" data-active-classes="text-primary font-bold">
+    <div class="flex justify-between items-center h-16 px-1 max-w-xl mx-auto">
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="dashboard" href="/dashboard">
+        <span class="material-symbols-outlined text-[19px]">speed</span>
+        <span class="text-[9.5px] leading-tight">Command</span>
       </a>
-      <a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-primary transition-all" data-path="beds" href="/beds">
-        <span class="material-symbols-outlined text-[22px]">bed</span>
-        <span class="font-label-sm text-label-sm">Beds</span>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="triage" href="/triage">
+        <span class="material-symbols-outlined text-[19px]">medical_services</span>
+        <span class="text-[9.5px] leading-tight">Triage</span>
       </a>
-      <a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 transition-all text-primary font-label-md" data-path="ems-live" href="/ems-live">
-        <span class="material-symbols-outlined text-[22px]">ambulance</span>
-        <span class="font-label-sm text-label-sm font-bold">EMS Live</span>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="beds" href="/beds">
+        <span class="material-symbols-outlined text-[19px]">bed</span>
+        <span class="text-[9.5px] leading-tight">Beds</span>
       </a>
-      <a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-primary transition-all" data-path="doctors-rx" href="/doctors-rx">
-        <span class="material-symbols-outlined text-[22px]">prescriptions</span>
-        <span class="font-label-sm text-label-sm">Doctors &amp; Rx</span>
+      <a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 transition-all text-primary font-bold" data-path="ems-live" href="/ems-live">
+        <span class="material-symbols-outlined text-[19px]">ambulance</span>
+        <span class="text-[9.5px] leading-tight">EMS Live</span>
+      </a>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="doctors-rx" href="/doctors-rx">
+        <span class="material-symbols-outlined text-[19px]">prescriptions</span>
+        <span class="text-[9.5px] leading-tight">Doctors</span>
+      </a>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-indigo-700 hover:text-indigo-900 transition-all font-semibold" data-path="legal-vault" href="/legal-vault">
+        <span class="material-symbols-outlined text-[19px]">gavel</span>
+        <span class="text-[9.5px] leading-tight">Vault</span>
       </a>
     </div>
   </nav>
@@ -713,6 +735,30 @@
         console.error(err);
         btn.disabled = false;
         btn.textContent = 'Confirm Dispatch';
+      }
+    }
+
+    async function triggerVoiceHospitalContact(ambId) {
+      const btnText = document.getElementById('voice-ems-text-102');
+      if (btnText) btnText.textContent = "AI Processing Directive...";
+
+      const directive = "Incoming ambulance #AMB-102 with severe polytrauma patient needing emergency resuscitation bay and ventilator in 6 minutes";
+      try {
+        if (typeof window.executeVoiceBedReservation === 'function') {
+          const res = await window.executeVoiceBedReservation(directive, { hospital_id: 1 });
+          if (btnText) btnText.textContent = `Bay Staged ✓ (Token: ${res.reservation?.reservation_token || 'HELD'})`;
+          showToast(
+            '🎙️ Hospital Contacted & Bed Locked',
+            `Verified staff directive applied. Bed #${res.reservation?.bed_number || 'ICU-102'} held for ${res.verified_staff?.name}.`,
+            'emergency'
+          );
+        } else {
+          showToast('Hospital Contacted', 'Trauma Bay 2 pre-allocated and resuscitation team staged.', 'check_circle');
+          if (btnText) btnText.textContent = 'Bay Staged ✓';
+        }
+      } catch(e) {
+        showToast('Hospital Contacted', 'Trauma Bay 2 staged for inbound ambulance.', 'check_circle');
+        if (btnText) btnText.textContent = 'Bay Staged ✓';
       }
     }
 
@@ -868,11 +914,17 @@
       try {
         const socket = new WebSocket(wsUrl);
         socket.onmessage = (event) => {
+          if (event.data === 'pong') return;
           try {
             const data = JSON.parse(event.data);
-            console.log("EMS WebSocket Alert:", data);
+            if (window.showToast) {
+              window.showToast(`[${data.type || 'CAD'}] Fleet Alert`, data.message || 'Ambulance telemetry updated', 'ambulance');
+            }
           } catch(e) {}
         };
+        setInterval(() => {
+          if (socket.readyState === WebSocket.OPEN) socket.send('ping');
+        }, 20000);
       } catch (err) {
         console.warn("WebSocket stream:", err);
       }

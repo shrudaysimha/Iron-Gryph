@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta name="theme-color" content="#ffffff"/>
+  <title>Iron-Gryph — Legal & Evidence Vault (FIPS 180-4 SHA-256)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    .card-minimal {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+    .card-minimal:hover {
+      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+      border-color: #cbd5e1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-slate-800 bg-slate-50/70">
+
+  <!-- TOP MINIMAL STRIP -->
+  <div class="bg-white border-b border-slate-200/80 px-4 py-1.5 text-xs flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold border border-indigo-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping"></span>
+        2:00–2:35 LEGAL VAULT
+      </span>
+      <span class="text-slate-500 text-[11px] hidden sm:inline">Cryptographic Evidence Management</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/dashboard" class="px-2.5 py-0.5 rounded-md hover:bg-slate-100 text-slate-600 text-[11px] font-medium transition flex items-center gap-1">
+        <span class="material-symbols-outlined text-[13px]">arrow_back</span>
+        <span>Back to Surge AI</span>
+      </a>
+      <!-- Role Switcher -->
+      <div class="flex items-center gap-1 p-0.5 rounded bg-slate-100 border border-slate-200">
+        <button id="role-admin-btn" onclick="switchRole('admin')" class="px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px] font-bold">Admin</button>
+        <button id="role-inv-btn" onclick="switchRole('investigator')" class="px-2 py-0.5 rounded text-slate-500 hover:text-slate-900 text-[10px] font-medium">Investigator</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CLEAN HEADER -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-[33px] z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">gavel</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-base font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
+              <span>IRON-GRYPH</span>
+              <span class="text-slate-300 font-light">|</span>
+              <span class="text-indigo-700 font-semibold text-sm">Legal & Evidence Vault</span>
+            </h1>
+            <span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+              FIPS 180-4
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium">Cryptographic SHA-256 Chain of Custody</p>
+        </div>
+      </div>
+
+      <!-- Action Tabs -->
+      <div class="hidden md:flex items-center gap-1">
+        <button onclick="switchTab('cases')" id="tab-cases-btn" class="px-3 py-1.5 rounded-lg bg-slate-100 text-indigo-800 text-xs font-semibold flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px]">folder</span>
+          Cases & Exhibits
+        </button>
+        <button onclick="switchTab('upload')" id="tab-upload-btn" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-medium transition flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px]">cloud_upload</span>
+          Deposit Exhibit
+        </button>
+        <button onclick="switchTab('audit')" id="tab-audit-btn" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-medium transition flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px]">history_edu</span>
+          Audit Ledger
+        </button>
+      </div>
+
+      <!-- Profile -->
+      <div class="flex items-center gap-2.5">
+        <a href="/dashboard" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px] text-sky-700">speed</span>
+          <span class="hidden sm:inline">Surge AI</span>
+        </a>
+        <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
+        <div class="text-right hidden sm:block">
+          <p class="text-xs font-semibold text-slate-800" id="user-name-display">Chief Elena Vance</p>
+          <p class="text-[10px] text-slate-500 font-mono" id="user-badge-display">ADM-001 (Administrator)</p>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN VAULT CONTENT -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+    <!-- TAB 1: CASES & EVIDENCE EXHIBITS -->
+    <div id="tab-content-cases" class="space-y-6">
+
+      <!-- Case Overview Bar -->
+      <div class="card-minimal p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold text-[10px] uppercase tracking-wider border border-indigo-200">2:00–2:35 LEGAL VAULT</span>
+          <h2 class="text-lg font-bold text-slate-900 mt-1">Investigation Repository & Exhibits</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Select a case to inspect evidence exhibits and verify live cryptographic seals:</p>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <select id="case-category-filter" onchange="filterCases()" class="bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500">
+            <option value="all">All Categories</option>
+            <option value="Financial Fraud">Financial Fraud</option>
+            <option value="Cybercrime">Cybercrime</option>
+            <option value="Narcotics">Narcotics</option>
+            <option value="Public Corruption">Public Corruption</option>
+          </select>
+          <button onclick="openUploadModal()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Deposit Exhibit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Case List Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="cases-grid">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- ACTIVE EVIDENCE DETAIL & SHA-256 VERIFICATION -->
+      <div id="evidence-detail-panel" class="card-minimal p-6 rounded-2xl border-indigo-200 space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-[10px] uppercase tracking-wider border border-emerald-200">ACTIVE EXHIBIT</span>
+              <span class="text-xs font-mono text-slate-500" id="detail-case-badge">CASE-2026-1042</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mt-1" id="detail-title">Trauma Admission & EMS Field Telemetry (Run #994-AZ)</h3>
+            <p class="text-xs text-slate-600 mt-1 max-w-3xl" id="detail-desc">
+              Authenticated paramedic field transmission telemetry showing vital sign deterioration during highway multi-trauma transport.
+            </p>
+          </div>
+
+          <!-- Shield Status Badge -->
+          <div class="flex items-center gap-3">
+            <div id="shield-container" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+              <span class="material-symbols-outlined text-[24px] text-emerald-600" id="shield-icon">verified_user</span>
+              <div>
+                <span class="text-xs font-bold block" id="shield-status-text">VERIFIED GREEN</span>
+                <span class="text-[10px] text-emerald-600 block" id="shield-sub-text">SHA-256 Digest Matches Canon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hash Fingerprints Display -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="flex items-center justify-between text-xs text-slate-600">
+              <span class="font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-indigo-600">fingerprint</span>
+                Intake Canonical SHA-256 Digest
+              </span>
+              <span class="text-[10px] font-mono text-emerald-700">IMMUTABLE</span>
+            </div>
+            <p class="text-xs font-mono text-slate-800 break-all mt-2 p-2 rounded bg-white border border-slate-200" id="detail-expected-hash">
+              bf57089b8ece54facdf4ad8049dc21e70b9b2bc5256d1fa4c2add15f78c7eae9
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="flex items-center justify-between text-xs text-slate-600">
+              <span class="font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-sky-600">cached</span>
+                Live Physical Disk Hash
+              </span>
+              <span class="text-[10px] font-mono text-slate-500" id="detail-verified-at">Verified Just Now</span>
+            </div>
+            <p class="text-xs font-mono text-slate-800 break-all mt-2 p-2 rounded bg-white border border-slate-200" id="detail-current-hash">
+              bf57089b8ece54facdf4ad8049dc21e70b9b2bc5256d1fa4c2add15f78c7eae9
+            </p>
+          </div>
+        </div>
+
+        <!-- Verification Buttons -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          <div class="flex items-center gap-2">
+            <button onclick="verifyCurrentEvidence()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+              <span class="material-symbols-outlined text-[16px]">verified</span>
+              <span>Verify SHA-256 Hash</span>
+            </button>
+            <button onclick="simulateTamper()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+              <span class="material-symbols-outlined text-[16px]">gpp_bad</span>
+              <span>Simulate Tamper (Test Red Warning)</span>
+            </button>
+            <button onclick="restoreSeal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition flex items-center gap-1.5 border border-slate-200">
+              <span class="material-symbols-outlined text-[16px]">restore</span>
+              <span>Restore Seal</span>
+            </button>
+          </div>
+
+          <button onclick="downloadActiveEvidence()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition flex items-center gap-1.5 border border-slate-200">
+            <span class="material-symbols-outlined text-[16px]">download</span>
+            <span>Download Exhibit</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: EVIDENCE UPLOAD INGRESS -->
+    <div id="tab-content-upload" class="card-minimal p-6 rounded-2xl space-y-6 hidden">
+      <div class="pb-3 border-b border-slate-100">
+        <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold text-[10px] uppercase tracking-wider border border-indigo-200">EVIDENCE INGRESS</span>
+        <h2 class="text-xl font-bold text-slate-900 mt-1">Deposit Forensic Exhibit & Compute Hash</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Calculates instantaneous cryptographic SHA-256 in browser with WebCrypto subtle before transmitting to vault:</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Case</label>
+            <select id="upload-case-select" class="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Exhibit Title</label>
+            <input type="text" id="upload-title" placeholder="e.g. Crash Telemetry & Blackbox Stream" class="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-500"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Forensic Category</label>
+            <select id="upload-category" class="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-500">
+              <option value="Forensic Report">Forensic Report</option>
+              <option value="Toxicology">Toxicology</option>
+              <option value="Medical Examiner Notes">Medical Examiner Notes</option>
+              <option value="Crash Telemetry">Crash Telemetry</option>
+              <option value="Chain of Custody Form">Chain of Custody Form</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Description / Custodian Notes</label>
+            <textarea id="upload-desc" rows="3" placeholder="Transfer notes, impound details, custodian signatures..." class="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-500"></textarea>
+          </div>
+        </div>
+
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 hover:border-indigo-400 transition text-center">
+          <input type="file" id="file-upload-input" onchange="handleFileSelected(event)" class="hidden"/>
+          
+          <div class="cursor-pointer py-6" onclick="document.getElementById('file-upload-input').click()">
+            <span class="material-symbols-outlined text-[44px] text-indigo-600 mb-2">upload_file</span>
+            <p class="text-sm font-semibold text-slate-800">Click to Select Evidence File or Drag & Drop</p>
+            <p class="text-xs text-slate-500 mt-1">PDF, TXT, RAW, BIN, DOCX (Max 50MB)</p>
+          </div>
+
+          <div class="mt-4 p-3 rounded-xl bg-white border border-slate-200 text-left">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="text-slate-600 font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px] text-indigo-600">lock</span>
+                Client-Side WebCrypto SHA-256:
+              </span>
+              <span class="text-[10px] text-emerald-700 font-mono" id="webcrypto-status">Ready</span>
+            </div>
+            <p class="text-[11px] font-mono text-indigo-700 break-all select-all p-1.5 rounded bg-slate-50 border border-slate-200" id="preview-hash-display">
+              Select a file to compute client-side SHA-256 digest...
+            </p>
+            <p class="text-[10px] text-slate-500 mt-1" id="file-meta-display">No file selected</p>
+          </div>
+
+          <button onclick="submitUpload()" id="btn-submit-upload" class="mt-4 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">verified_user</span>
+            <span>Deposit Evidence & Commit SHA-256 Seal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AUDIT & CHAIN OF CUSTODY LEDGER -->
+    <div id="tab-content-audit" class="card-minimal p-6 rounded-2xl space-y-4 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold text-[10px] uppercase tracking-wider border border-indigo-200">ADMINISTRATIVE LEDGER</span>
+          <h2 class="text-xl font-bold text-slate-900 mt-1">Immutable Chain-of-Custody Audit Trail</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Recording every deposit, verification, tamper alert, and forensic export:</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="loadAuditLogs()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">refresh</span>
+            <span>Refresh</span>
+          </button>
+          <button onclick="exportAuditJson()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition flex items-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-[14px]">download</span>
+            <span>Judicial Export (JSON)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-xs text-slate-700">
+          <thead class="bg-slate-50 text-slate-500 text-[11px] uppercase font-mono border-b border-slate-200">
+            <tr>
+              <th class="p-3">Timestamp (UTC)</th>
+              <th class="p-3">Officer / Actor</th>
+              <th class="p-3">Action Event</th>
+              <th class="p-3">Details</th>
+              <th class="p-3">SHA-256 Snapshot</th>
+            </tr>
+          </thead>
+          <tbody id="audit-table-body" class="divide-y divide-slate-100 font-mono text-[11px]">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let activeEvidenceId = 1;
+    let currentRole = 'administrator';
+    let cachedCases = [];
+
+    function switchRole(role) {
+      currentRole = role;
+      const adminBtn = document.getElementById('role-admin-btn');
+      const invBtn = document.getElementById('role-inv-btn');
+      const nameDisp = document.getElementById('user-name-display');
+      const badgeDisp = document.getElementById('user-badge-display');
+
+      if (role === 'admin') {
+        adminBtn.className = 'px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px] font-bold';
+        invBtn.className = 'px-2 py-0.5 rounded text-slate-500 hover:text-slate-900 text-[10px] font-medium';
+        nameDisp.textContent = 'Chief Elena Vance';
+        badgeDisp.textContent = 'ADM-001 (Administrator)';
+      } else {
+        invBtn.className = 'px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px] font-bold';
+        adminBtn.className = 'px-2 py-0.5 rounded text-slate-500 hover:text-slate-900 text-[10px] font-medium';
+        nameDisp.textContent = 'Detective Marcus Cole';
+        badgeDisp.textContent = 'INV-401 (Investigator)';
+      }
+      loadAuditLogs();
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tab-content-cases').classList.add('hidden');
+      document.getElementById('tab-content-upload').classList.add('hidden');
+      document.getElementById('tab-content-audit').classList.add('hidden');
+
+      document.getElementById('tab-cases-btn').className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-medium transition flex items-center gap-1.5';
+      document.getElementById('tab-upload-btn').className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-medium transition flex items-center gap-1.5';
+      document.getElementById('tab-audit-btn').className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-medium transition flex items-center gap-1.5';
+
+      if (tab === 'cases') {
+        document.getElementById('tab-content-cases').classList.remove('hidden');
+        document.getElementById('tab-cases-btn').className = 'px-3 py-1.5 rounded-lg bg-slate-100 text-indigo-800 text-xs font-semibold flex items-center gap-1.5';
+      } else if (tab === 'upload') {
+        document.getElementById('tab-content-upload').classList.remove('hidden');
+        document.getElementById('tab-upload-btn').className = 'px-3 py-1.5 rounded-lg bg-slate-100 text-indigo-800 text-xs font-semibold flex items-center gap-1.5';
+      } else if (tab === 'audit') {
+        document.getElementById('tab-content-audit').classList.remove('hidden');
+        document.getElementById('tab-audit-btn').className = 'px-3 py-1.5 rounded-lg bg-slate-100 text-indigo-800 text-xs font-semibold flex items-center gap-1.5';
+        loadAuditLogs();
+      }
+    }
+
+    function openUploadModal() {
+      switchTab('upload');
+    }
+
+    async function loadCases() {
+      try {
+        const resp = await fetch('/api/v1/cases/', {
+          headers: { 'X-Role': currentRole }
+        });
+        if (resp.ok) {
+          cachedCases = await resp.json();
+          renderCases(cachedCases);
+          populateUploadSelect(cachedCases);
+        }
+      } catch (e) {
+        console.error('Error loading cases:', e);
+      }
+    }
+
+    function renderCases(cases) {
+      const grid = document.getElementById('cases-grid');
+      grid.innerHTML = '';
+
+      cases.slice(0, 6).forEach(c => {
+        const priorityColor = c.priority === 'Critical' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                             c.priority === 'High' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                             'bg-sky-50 text-sky-700 border-sky-200';
+
+        const card = document.createElement('div');
+        card.className = 'card-minimal p-4 rounded-xl flex flex-col justify-between cursor-pointer transition';
+        card.onclick = () => selectCase(c);
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-mono font-bold text-indigo-700">${c.case_number}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${priorityColor}">${c.priority}</span>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900 leading-snug">${c.title}</h4>
+            <p class="text-xs text-slate-500 mt-1 line-clamp-2">${c.description}</p>
+          </div>
+          <div class="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 text-[10px] text-slate-500 font-mono">
+            <span>${c.category}</span>
+            <span class="text-indigo-700 font-bold">${c.evidence_count || 1} Exhibits</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function populateUploadSelect(cases) {
+      const sel = document.getElementById('upload-case-select');
+      sel.innerHTML = '';
+      cases.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.case_number} — ${c.title}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function filterCases() {
+      const val = document.getElementById('case-category-filter').value;
+      if (val === 'all') {
+        renderCases(cachedCases);
+      } else {
+        renderCases(cachedCases.filter(c => c.category === val));
+      }
+    }
+
+    async function selectCase(c) {
+      try {
+        const resp = await fetch(`/api/v1/cases/${c.id}`, {
+          headers: { 'X-Role': currentRole }
+        });
+        if (resp.ok) {
+          const detail = await resp.json();
+          document.getElementById('detail-case-badge').textContent = detail.case_number;
+          if (detail.evidence_documents && detail.evidence_documents.length > 0) {
+            const ev = detail.evidence_documents[0];
+            activeEvidenceId = ev.id;
+            document.getElementById('detail-title').textContent = ev.title;
+            document.getElementById('detail-desc').textContent = ev.description || detail.description;
+            document.getElementById('detail-expected-hash').textContent = ev.sha256_hash;
+            document.getElementById('detail-current-hash').textContent = ev.sha256_hash;
+            updateShield(ev.is_tampered ? 'TAMPERED_RED' : 'VERIFIED_GREEN');
+          }
+        }
+      } catch (e) {
+        console.error('Select case error:', e);
+      }
+    }
+
+    async function verifyCurrentEvidence() {
+      try {
+        const resp = await fetch(`/api/v1/evidence/${activeEvidenceId}/verify`, {
+          method: 'POST',
+          headers: { 'X-Role': currentRole }
+        });
+        if (resp.ok) {
+          const res = await resp.json();
+          document.getElementById('detail-expected-hash').textContent = res.expected_hash;
+          document.getElementById('detail-current-hash').textContent = res.current_hash;
+          document.getElementById('detail-verified-at').textContent = 'Verified: ' + new Date().toLocaleTimeString();
+          updateShield(res.status_badge);
+        }
+      } catch (e) {
+        console.error('Verify hash error:', e);
+      }
+    }
+
+    async function simulateTamper() {
+      try {
+        const resp = await fetch(`/api/v1/evidence/${activeEvidenceId}/simulate-tamper`, {
+          method: 'POST',
+          headers: { 'X-Role': currentRole }
+        });
+        if (resp.ok) {
+          const res = await resp.json();
+          document.getElementById('detail-expected-hash').textContent = res.expected_hash;
+          document.getElementById('detail-current-hash').textContent = res.current_hash;
+          document.getElementById('detail-verified-at').textContent = 'Tamper Detected: ' + new Date().toLocaleTimeString();
+          updateShield('TAMPERED_RED');
+        }
+      } catch (e) {
+        console.error('Tamper error:', e);
+      }
+    }
+
+    async function restoreSeal() {
+      try {
+        const resp = await fetch(`/api/v1/evidence/${activeEvidenceId}/restore`, {
+          method: 'POST',
+          headers: { 'X-Role': currentRole }
+        });
+        if (resp.ok) {
+          const res = await resp.json();
+          document.getElementById('detail-expected-hash').textContent = res.expected_hash;
+          document.getElementById('detail-current-hash').textContent = res.current_hash;
+          document.getElementById('detail-verified-at').textContent = 'Restored: ' + new Date().toLocaleTimeString();
+          updateShield('VERIFIED_GREEN');
+        }
+      } catch (e) {
+        console.error('Restore error:', e);
+      }
+    }
+
+    function updateShield(status) {
+      const container = document.getElementById('shield-container');
+      const icon = document.getElementById('shield-icon');
+      const statusText = document.getElementById('shield-status-text');
+      const subText = document.getElementById('shield-sub-text');
+
+      if (status === 'TAMPERED_RED') {
+        container.className = 'flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-800';
+        icon.textContent = 'gpp_bad';
+        icon.className = 'material-symbols-outlined text-[24px] text-rose-600';
+        statusText.textContent = 'TAMPER ALARM (RED)';
+        subText.textContent = 'Hash Mismatch Detected!';
+        subText.className = 'text-[10px] text-rose-600 block';
+      } else {
+        container.className = 'flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800';
+        icon.textContent = 'verified_user';
+        icon.className = 'material-symbols-outlined text-[24px] text-emerald-600';
+        statusText.textContent = 'VERIFIED GREEN';
+        subText.textContent = 'SHA-256 Digest Matches Canon';
+        subText.className = 'text-[10px] text-emerald-600 block';
+      }
+    }
+
+    function downloadActiveEvidence() {
+      window.open(`/api/v1/evidence/${activeEvidenceId}/download`, '_blank');
+    }
+
+    let selectedFile = null;
+    async function handleFileSelected(e) {
+      selectedFile = e.target.files[0];
+      if (!selectedFile) return;
+
+      document.getElementById('file-meta-display').textContent = `${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`;
+      document.getElementById('webcrypto-status').textContent = 'Computing...';
+
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      document.getElementById('preview-hash-display').textContent = hashHex;
+      document.getElementById('webcrypto-status').textContent = 'Computed In-Browser';
+    }
+
+    async function submitUpload() {
+      if (!selectedFile) {
+        alert('Please select an evidence file first.');
+        return;
+      }
+      const caseId = document.getElementById('upload-case-select').value;
+      const title = document.getElementById('upload-title').value || selectedFile.name;
+      const desc = document.getElementById('upload-desc').value;
+      const category = document.getElementById('upload-category').value;
+
+      const fd = new FormData();
+      fd.append('case_id', caseId);
+      fd.append('title', title);
+      fd.append('description', desc);
+      fd.append('category', category);
+      fd.append('file', selectedFile);
+
+      try {
+        const resp = await fetch('/api/v1/evidence/upload', {
+          method: 'POST',
+          headers: { 'X-Role': currentRole },
+          body: fd
+        });
+        if (resp.ok) {
+          const res = await resp.json();
+          alert(`Exhibit Deposited!\nSHA-256 Seal: ${res.sha256_hash.substring(0, 24)}...`);
+          switchTab('cases');
+          loadCases();
+        } else {
+          alert('Upload failed.');
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+      }
+    }
+
+    async function loadAuditLogs() {
+      try {
+        const resp = await fetch('/api/v1/audit/?limit=50', {
+          headers: { 'X-Role': currentRole }
+        });
+        if (resp.ok) {
+          const logs = await resp.json();
+          renderAuditLogs(logs);
+        }
+      } catch (e) {
+        console.error('Audit load error:', e);
+      }
+    }
+
+    function renderAuditLogs(logs) {
+      const tbody = document.getElementById('audit-table-body');
+      tbody.innerHTML = '';
+
+      logs.forEach(l => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-slate-50 transition';
+        const isTamper = l.action.includes('TAMPER') || l.action.includes('ALERT');
+        const badgeColor = isTamper ? 'text-rose-700 bg-rose-50' : 'text-indigo-700 bg-indigo-50';
+
+        row.innerHTML = `
+          <td class="p-3 text-slate-500">${new Date(l.timestamp).toISOString().replace('T', ' ').substring(0, 19)}</td>
+          <td class="p-3 text-slate-900 font-medium">${l.username} (${l.user_role})</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded font-bold ${badgeColor}">${l.action}</span></td>
+          <td class="p-3 text-slate-600 max-w-xs truncate">${l.details}</td>
+          <td class="p-3 text-slate-400 truncate max-w-[140px]">${l.sha256_snapshot ? l.sha256_snapshot.substring(0, 18) + '...' : '—'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function exportAuditJson() {
+      window.open('/api/v1/audit/export', '_blank');
+    }
+
+    loadCases();
+    verifyCurrentEvidence();
+  </script>
+</body>
+</html>

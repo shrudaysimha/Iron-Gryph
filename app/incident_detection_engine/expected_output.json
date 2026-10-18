@@ -1,0 +1,102 @@
+{
+  "engine": "member4-incident-detection-demo",
+  "is_simulated_demo": true,
+  "clinical_validation": "NOT_VALIDATED",
+  "hospital": {
+    "latitude": 12.9716,
+    "longitude": 77.5946
+  },
+  "configuration": {
+    "cluster_radius_km": 5.0,
+    "cluster_window_minutes": 120,
+    "nearby_radius_km": 15.0,
+    "moderate_risk_threshold": 35.0,
+    "high_risk_threshold": 70.0,
+    "weights": {
+      "count": 35.0,
+      "severity": 30.0,
+      "proximity": 20.0,
+      "weather": 15.0
+    }
+  },
+  "incident_count_total": 4,
+  "incident_count_scored": 3,
+  "clusters": [
+    {
+      "cluster_id": "CL-001",
+      "incident_ids": [
+        "INC-001",
+        "INC-002",
+        "INC-003"
+      ]
+    }
+  ],
+  "incidents": [
+    {
+      "incident_id": "INC-001",
+      "incident_type": "road_accident",
+      "latitude": 12.975,
+      "longitude": 77.6,
+      "timestamp": "2026-10-17T18:10:00Z",
+      "severity": 4,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "heavy_rain",
+      "distance_km": 0.6966384499006646,
+      "cluster_id": "CL-001"
+    },
+    {
+      "incident_id": "INC-002",
+      "incident_type": "road_accident",
+      "latitude": 12.978,
+      "longitude": 77.603,
+      "timestamp": "2026-10-17T18:45:00Z",
+      "severity": 3,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "heavy_rain",
+      "distance_km": 1.1553754546958888,
+      "cluster_id": "CL-001"
+    },
+    {
+      "incident_id": "INC-003",
+      "incident_type": "public_gathering",
+      "latitude": 12.969,
+      "longitude": 77.59,
+      "timestamp": "2026-10-17T19:00:00Z",
+      "severity": 2,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "none",
+      "distance_km": 0.5762227784105485,
+      "cluster_id": "CL-001"
+    },
+    {
+      "incident_id": "INC-004",
+      "incident_type": "storm_report",
+      "latitude": 13.12,
+      "longitude": 77.7,
+      "timestamp": "2026-10-17T18:30:00Z",
+      "severity": 4,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "storm",
+      "distance_km": 20.066216617860324,
+      "cluster_id": null
+    }
+  ],
+  "risk": {
+    "risk_score": 84.2,
+    "risk_category": "HIGH",
+    "reasons": [
+      "3 incident(s) considered (count contribution: 35.0/ 35.0).",
+      "Average severity is 3.0/5 (severity contribution: 15.0/ 30.0).",
+      "Nearest incident is 0.58 km away (proximity contribution: 19.2/ 20.0).",
+      "Relevant weather signal present (weather contribution: 15.0/ 15.0)."
+    ],
+    "factors": {
+      "incident_count": 3,
+      "count_factor": 1.0,
+      "average_severity": 3.0,
+      "nearest_distance_km": 0.58,
+      "weather_signal_present": true
+    }
+  },
+  "alert": "HIGH potential surge-risk alert (demo score 84.2/100). 3 incident(s) considered (count contribution: 35.0/ 35.0). Average severity is 3.0/5 (severity contribution: 15.0/ 30.0). Nearest incident is 0.58 km away (proximity contribution: 19.2/ 20.0). Relevant weather signal present (weather contribution: 15.0/ 15.0). Detected 1 nearby cluster(s): INC-001, INC-002, INC-003 This is a simulated operational heuristic, not a clinically validated prediction."
+}

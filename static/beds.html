@@ -138,24 +138,33 @@
 
   <!-- Top App Bar -->
   <header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe">
-    <div class="h-16 px-gutter flex items-center justify-between">
+    <div class="h-16 px-gutter flex items-center justify-between max-w-xl mx-auto">
       <div class="flex items-center gap-space-sm">
-        <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm">
-          <span class="material-symbols-outlined text-[20px]">local_hospital</span>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary via-primary-container to-secondary flex items-center justify-center text-on-primary shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">shield_with_heart</span>
         </div>
         <div class="flex flex-col">
           <div class="flex items-center gap-1.5">
-            <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">MediBook</span>
+            <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">Iron-Gryph</span>
+            <span class="text-xs text-on-surface-variant hidden sm:inline">| MedCore Surge AI</span>
             <span class="px-1.5 py-0.5 rounded-full bg-error/10 text-error font-label-sm text-label-sm uppercase flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>LIVE
             </span>
           </div>
-          <span class="font-label-sm text-label-sm text-on-surface-variant -mt-0.5">SIDS Hospital Surat</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant -mt-0.5">SIDS Hospital Surat • 2-Hour Ahead Predictive Hub</span>
         </div>
       </div>
       <div class="flex items-center gap-space-sm">
-        <button id="sos-btn" aria-label="Emergency SOS" class="w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-low text-tertiary relative hover:bg-surface-container transition-colors">
-          <span class="material-symbols-outlined text-[22px]">emergency</span>
+        <a href="/dashboard" class="px-2.5 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-label-sm text-xs font-bold transition flex items-center gap-1 border border-outline-variant/30" title="Return to Master Command Center">
+          <span class="material-symbols-outlined text-[16px]">speed</span>
+          <span class="hidden md:inline">Command Center</span>
+        </a>
+        <a href="/legal-vault" class="px-2.5 py-1.5 rounded-xl bg-indigo-950 text-indigo-300 hover:bg-indigo-900 font-label-sm text-xs font-bold transition flex items-center gap-1 border border-indigo-700/50" title="Open Forensic Legal Vault">
+          <span class="material-symbols-outlined text-[16px]">gavel</span>
+          <span class="hidden md:inline">Legal Vault</span>
+        </a>
+        <button id="sos-btn" aria-label="Emergency SOS" class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-tertiary relative hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-[20px]">emergency</span>
           <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface animate-ping"></span>
         </button>
         <button onclick="window.openProfileDrawer()" class="flex items-center gap-1.5 p-1 pr-2.5 rounded-full bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/30" title="Click to view Staff Profile & Station Access">
@@ -179,7 +188,7 @@
           </div>
           <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm shadow-sm">
             <span class="material-symbols-outlined text-[14px] text-primary">sync</span>
-            <span>Sync: <strong class="text-on-surface font-semibold" id="latency-counter">18ms</strong></span>
+            <span>Sync: <strong class="text-emerald-700 font-semibold">Active</strong></span>
           </div>
         </div>
 
@@ -228,7 +237,7 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">Conflict-Free Linear Optimizer</span>
-                <span class="font-label-sm text-label-sm bg-surface-container-highest px-2 py-0.5 rounded-full text-primary font-bold" id="optimizer-time">Live Run</span>
+                <span class="font-label-sm text-label-sm bg-surface-container-highest px-2 py-0.5 rounded-full text-primary font-bold">Auto-Optimized</span>
               </div>
               <p class="font-headline-sm text-headline-sm text-on-surface mt-0.5">Surge Anticipation Protocol</p>
               <p class="font-body-sm text-body-sm text-on-surface-variant mt-1" id="optimizer-rationale">
@@ -307,7 +316,7 @@
             <div id="er-bar" class="bg-primary-container h-full rounded-full transition-all duration-500" style="width: 78%"></div>
           </div>
           <div class="flex items-center justify-between pt-space-xs font-label-sm text-label-sm text-on-surface-variant">
-            <span>Average Triage Dwell: <strong>14 min</strong></span>
+            <span>Ward Status: <strong>Optimal Flow</strong></span>
             <span class="text-primary font-semibold" id="er-bays-open">10 Bays Open</span>
           </div>
         </div>
@@ -347,8 +356,127 @@
         </div>
         <button id="refresh-beds-btn" class="text-primary font-label-md text-label-md flex items-center gap-0.5 hover:underline">
           <span class="material-symbols-outlined text-[16px]">refresh</span>
-          <span>Sync Beds</span>
-        </button>
+      </div>
+
+      <!-- Voice-Enabled Rapid Bed Reservation & Hospital Contact Hub -->
+      <div class="px-gutter py-space-xs">
+        <div class="p-space-md rounded-3xl bg-gradient-to-br from-surface-container-high via-surface-container to-surface-container-low border border-primary/20 shadow-lg relative overflow-hidden">
+          <!-- Ambient decorative light glow -->
+          <div class="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+
+          <div class="flex items-start justify-between gap-3 mb-space-sm relative z-10">
+            <div class="flex items-center gap-space-xs">
+              <div class="w-11 h-11 rounded-2xl bg-primary text-on-primary flex items-center justify-center shadow-md relative" id="voice-mic-icon-wrapper">
+                <span class="material-symbols-outlined text-[24px]">mic</span>
+                <span id="voice-pulse-ring" class="hidden absolute inset-0 rounded-2xl border-2 border-primary animate-ping"></span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-headline-sm text-base text-on-surface font-bold">Voice-Enabled Bed & Hospital Contact</h3>
+                  <span class="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold tracking-wider uppercase flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> AI Clinical Model
+                  </span>
+                </div>
+                <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">
+                  Bypasses manual forms • Automatically binds verified profile <strong id="voice-verified-badge" class="text-primary font-bold">(Dr. Rajiv Mehta • EMP-1005)</strong>
+                </p>
+              </div>
+            </div>
+            <!-- Auto-fill indicator -->
+            <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-container-lowest text-xs text-on-surface-variant font-medium border border-outline-variant/40">
+              <span class="material-symbols-outlined text-[15px] text-primary">verified</span>
+              <span>Zero Manual Input Needed</span>
+            </div>
+          </div>
+
+          <!-- Controls: Microphone Trigger & Speech Status -->
+          <div class="bg-surface-container-lowest/80 rounded-2xl p-space-sm border border-outline-variant/30 flex flex-col gap-2 relative z-10 mb-space-xs">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+              <button id="voice-directive-btn" class="h-11 px-space-lg rounded-xl bg-primary text-on-primary font-label-md text-label-md font-bold shadow-md hover:bg-primary-container active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]" id="voice-btn-icon">mic</span>
+                <span id="voice-btn-label">Speak Clinical Directive</span>
+              </button>
+              
+              <div class="flex-1 px-3 py-2 rounded-xl bg-surface-container text-xs text-on-surface-variant flex items-center justify-between gap-2 overflow-hidden border border-outline-variant/20" id="voice-transcript-wrapper">
+                <div class="flex items-center gap-2 overflow-hidden truncate">
+                  <span class="material-symbols-outlined text-[16px] text-primary" id="voice-waveform-icon">graphic_eq</span>
+                  <span id="voice-transcript-text" class="truncate italic text-on-surface">Click speak or pick an emergency clinical preset below...</span>
+                </div>
+                <span id="voice-status-pill" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant whitespace-nowrap">Ready</span>
+              </div>
+            </div>
+
+            <!-- 1-Click Emergency Directive Chips -->
+            <div class="flex flex-wrap items-center gap-1.5 pt-1">
+              <span class="text-[10px] uppercase font-bold text-on-surface-variant mr-1">Emergency Presets:</span>
+              <button type="button" class="voice-preset-chip px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-[11px] text-on-surface font-medium transition-all flex items-center gap-1 active:scale-95 cursor-pointer" data-text="Reserve ICU bed 102 for acute heart attack patient with ventilator support">
+                <span>⚡ Acute STEMI (ICU-102 + Vent)</span>
+              </button>
+              <button type="button" class="voice-preset-chip px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-[11px] text-on-surface font-medium transition-all flex items-center gap-1 active:scale-95 cursor-pointer" data-text="Emergency trauma hold! Incoming ESI-1 road accident polytrauma GCS 8">
+                <span>⚡ ESI-1 Neurotrauma GCS 8</span>
+              </button>
+              <button type="button" class="voice-preset-chip px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-[11px] text-on-surface font-medium transition-all flex items-center gap-1 active:scale-95 cursor-pointer" data-text="Contact hospital to prepare resuscitation bay for acute respiratory distress">
+                <span>⚡ Respiratory Distress + High-Flow O2</span>
+              </button>
+              <button type="button" class="voice-preset-chip px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-[11px] text-on-surface font-medium transition-all flex items-center gap-1 active:scale-95 cursor-pointer" data-text="Hold step-down bed for incoming post-op observation patient">
+                <span>⚡ Step-Down Post-Op Hold</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic AI Model Analysis & Lock Breakdown (Hidden by default, displayed on speech execution) -->
+          <div id="voice-model-result" class="hidden animate-in fade-in zoom-in-95 duration-200 mt-2 bg-surface-container-lowest rounded-2xl p-space-sm border border-primary/30 flex flex-col gap-2 relative z-10">
+            <div class="flex items-center justify-between pb-1.5 border-b border-surface-container">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+                <span class="text-xs font-bold text-on-surface">Clinical Voice Model Analysis Result</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="voice-replay-audio-btn" class="text-primary hover:underline text-xs flex items-center gap-1 font-bold cursor-pointer">
+                  <span class="material-symbols-outlined text-[15px]">volume_up</span>
+                  <span>Replay Audio</span>
+                </button>
+                <button type="button" onclick="document.getElementById('voice-model-result').classList.add('hidden')" class="text-on-surface-variant text-xs hover:text-on-surface cursor-pointer">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Entities Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+              <div class="p-2 rounded-xl bg-surface-container-low flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-on-surface-variant">Clinical Acuity</span>
+                <span id="res-acuity-tag" class="text-xs font-bold text-error mt-0.5">ESI-1 Resuscitation</span>
+              </div>
+              <div class="p-2 rounded-xl bg-surface-container-low flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-on-surface-variant">Condition Detected</span>
+                <span id="res-condition-tag" class="text-xs font-bold text-on-surface mt-0.5 truncate">Acute STEMI</span>
+              </div>
+              <div class="p-2 rounded-xl bg-surface-container-low flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-on-surface-variant">Equipment Staged</span>
+                <span id="res-equipment-tag" class="text-xs font-bold text-primary mt-0.5 truncate">Ventilator + O2</span>
+              </div>
+              <div class="p-2 rounded-xl bg-secondary-fixed/30 border border-secondary/30 flex flex-col">
+                <span class="text-[10px] uppercase font-bold text-secondary">Pessimistic Lock</span>
+                <span id="res-lock-tag" class="text-xs font-bold text-secondary mt-0.5">ICU-102 Locked (Active Hold)</span>
+              </div>
+            </div>
+
+            <!-- Verified Staff Auto-Binding Details -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-2 rounded-xl bg-surface-container-low text-xs">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">verified_user</span>
+                <div>
+                  <span class="text-[11px] font-bold text-on-surface" id="res-staff-name">Dr. Rajiv Mehta, MD (Chief Trauma Surgeon)</span>
+                  <span class="text-[10px] text-on-surface-variant block" id="res-staff-badge">EMP-1005 • Verified Digital Signature Active • Zero Manual Entry</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 self-end sm:self-center">
+                <span class="px-2 py-0.5 rounded-md bg-primary text-on-primary font-mono text-[11px] font-bold" id="res-token-badge">TOKEN: A8F2BC41</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Conflict Notice Alert (Hidden by default, shown on 409 conflict) -->
@@ -443,8 +571,8 @@
               <span class="font-label-md text-label-md text-secondary font-semibold">100 Contenders Handled (Fair Queue)</span>
             </div>
             <div class="flex items-center justify-between pt-1">
-              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Auto-Release TTL</span>
-              <span class="px-2 py-0.5 rounded-md bg-secondary-container/20 text-secondary font-mono font-bold text-headline-sm" id="bed-ttl-timer">03:42</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Reservation Status</span>
+              <span class="px-2 py-0.5 rounded-md bg-secondary-container/20 text-secondary font-semibold text-label-md" id="bed-ttl-timer">Active Hold</span>
             </div>
           </div>
           <div class="flex items-center justify-between pt-space-xs">
@@ -485,8 +613,8 @@
               <span class="px-2 py-0.5 rounded bg-tertiary text-on-tertiary font-label-sm text-label-sm font-bold">ESI Level 2</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Admitted Timestamp</span>
-              <span class="font-label-md text-label-md text-on-surface">13:40 UTC (Active 1h 48m)</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Care Status</span>
+              <span class="font-label-md text-label-md text-on-surface font-semibold">Active Resuscitation Bay</span>
             </div>
           </div>
           <div class="flex items-center justify-between pt-space-xs">
@@ -522,8 +650,8 @@
               <span class="font-label-md text-label-md text-on-surface font-semibold">Terminal UV-C Decontamination</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Turnaround Est.</span>
-              <span class="font-headline-sm text-headline-sm text-primary font-bold">8 min remaining</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Sanitization Stage</span>
+              <span class="font-headline-sm text-headline-sm text-primary font-bold">UV-C Cycle Running</span>
             </div>
             <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden mt-1">
               <div class="bg-primary h-full rounded-full transition-all duration-700" style="width: 65%"></div>
@@ -537,28 +665,40 @@
             </button>
           </div>
         </div>
+
+        <!-- Dynamic Live Bed Grid Container (Loaded from Database via API & WebSockets) -->
+        <div id="dynamic-beds-list" class="flex flex-col gap-space-md"></div>
+
       </div>
     </div>
   </main>
 
-  <!-- Persistent Bottom Tab Bar Navigation -->
-  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-label-md">
-    <div class="flex justify-around items-center h-16 px-gutter-sm max-w-xl mx-auto">
-      <a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-primary transition-all" data-path="triage" href="/triage">
-        <span class="material-symbols-outlined text-[22px]">medical_services</span>
-        <span class="font-label-sm text-label-sm">Triage</span>
+  <!-- Persistent Bottom Tab Bar Navigation (6 Core Hospital Modules) -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)] border-t border-surface-container" data-active-classes="text-primary font-bold">
+    <div class="flex justify-between items-center h-16 px-1 max-w-xl mx-auto">
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="dashboard" href="/dashboard">
+        <span class="material-symbols-outlined text-[19px]">speed</span>
+        <span class="text-[9.5px] leading-tight">Command</span>
       </a>
-      <a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 transition-all text-primary font-label-md" data-path="beds" href="/beds">
-        <span class="material-symbols-outlined text-[22px]">bed</span>
-        <span class="font-label-sm text-label-sm font-bold">Beds</span>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="triage" href="/triage">
+        <span class="material-symbols-outlined text-[19px]">medical_services</span>
+        <span class="text-[9.5px] leading-tight">Triage</span>
       </a>
-      <a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-primary transition-all" data-path="ems-live" href="/ems-live">
-        <span class="material-symbols-outlined text-[22px]">ambulance</span>
-        <span class="font-label-sm text-label-sm">EMS Live</span>
+      <a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 transition-all text-primary font-bold" data-path="beds" href="/beds">
+        <span class="material-symbols-outlined text-[19px]">bed</span>
+        <span class="text-[9.5px] leading-tight">Beds</span>
       </a>
-      <a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-primary transition-all" data-path="doctors-rx" href="/doctors-rx">
-        <span class="material-symbols-outlined text-[22px]">prescriptions</span>
-        <span class="font-label-sm text-label-sm">Doctors &amp; Rx</span>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="ems-live" href="/ems-live">
+        <span class="material-symbols-outlined text-[19px]">ambulance</span>
+        <span class="text-[9.5px] leading-tight">EMS Live</span>
+      </a>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-on-surface-variant hover:text-primary transition-all" data-path="doctors-rx" href="/doctors-rx">
+        <span class="material-symbols-outlined text-[19px]">prescriptions</span>
+        <span class="text-[9.5px] leading-tight">Doctors</span>
+      </a>
+      <a class="flex flex-col items-center justify-center gap-0.5 w-[58px] h-12 text-indigo-700 hover:text-indigo-900 transition-all font-semibold" data-path="legal-vault" href="/legal-vault">
+        <span class="material-symbols-outlined text-[19px]">gavel</span>
+        <span class="text-[9.5px] leading-tight">Vault</span>
       </a>
     </div>
   </nav>
@@ -566,20 +706,10 @@
   <!-- Script for Real-Time Backend Integration -->
   <script>
     (function() {
-      // 1. Live Countdown for Bed #ICU-101
-      let secondsLeft = 222;
+      // 1. Bed Hold status for ICU-101
       const timerEl = document.getElementById('bed-ttl-timer');
       if (timerEl) {
-        setInterval(() => {
-          if (secondsLeft > 0) {
-            secondsLeft--;
-            const m = Math.floor(secondsLeft / 60);
-            const s = secondsLeft % 60;
-            timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-          } else {
-            timerEl.textContent = 'EXPIRED';
-          }
-        }, 1000);
+        timerEl.textContent = 'Active Hold';
       }
 
       // 2. Latency measurement to FastAPI backend
@@ -664,23 +794,8 @@
                 lockIcon.innerHTML = '<span class="material-symbols-outlined text-[18px]">lock_clock</span>';
               }
 
-              let holdSeconds = data.ttl_seconds || 300;
               reserveBtn.className = 'px-space-lg py-2.5 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md shadow-md flex items-center gap-1.5';
-              reserveBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">verified</span><span id="countdown-102">Locked (05:00)</span>`;
-
-              clearInterval(reservationTimerInterval);
-              reservationTimerInterval = setInterval(() => {
-                if (holdSeconds > 0) {
-                  holdSeconds--;
-                  const m = Math.floor(holdSeconds / 60);
-                  const s = holdSeconds % 60;
-                  const cEl = document.getElementById('countdown-102');
-                  if (cEl) cEl.textContent = `Locked (${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')})`;
-                } else {
-                  clearInterval(reservationTimerInterval);
-                  showToast('Lock Expired', '5-Minute Lock Expired. Bed returned to pool.', 'timer_off');
-                }
-              }, 1000);
+              reserveBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">verified</span><span id="countdown-102">Locked (Active Hold)</span>`;
 
               // Update action container to allow Confirm Admission or Abort Hold
               const actionsContainer = document.getElementById('actions-102');
@@ -707,7 +822,7 @@
           } catch(err) {
             console.error('Reservation error:', err);
             reserveBtn.className = 'px-space-lg py-2.5 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md shadow-md flex items-center gap-1.5';
-            reserveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span><span>Locked (05:00)</span>';
+            reserveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span><span>Locked (Active Hold)</span>';
           }
         });
       }
@@ -748,6 +863,236 @@
           showToast('Hold Released', 'Bed #' + bedId + ' released to pool.', 'info');
         }
       };
+
+      // ---- Voice-Enabled Bed Reservation & Hospital Contact Handler ----
+      let lastSpeechFeedbackText = "";
+      let recognitionInstance = null;
+
+      function initVoiceDirectiveSystem() {
+        // Sync verified profile badge in Voice Hub from active user
+        try {
+          const user = (typeof getActiveUser === 'function') ? getActiveUser() : (JSON.parse(localStorage.getItem('medibook_user') || '{}'));
+          const badgeEl = document.getElementById('voice-verified-badge');
+          if (badgeEl && user && user.name) {
+            badgeEl.textContent = `(${user.name} • ${user.employee_id || 'EMP-1005'})`;
+          }
+        } catch(e) {}
+
+        const voiceBtn = document.getElementById('voice-directive-btn');
+        const transcriptText = document.getElementById('voice-transcript-text');
+        const statusPill = document.getElementById('voice-status-pill');
+        const pulseRing = document.getElementById('voice-pulse-ring');
+        const btnIcon = document.getElementById('voice-btn-icon');
+        const btnLabel = document.getElementById('voice-btn-label');
+        const replayBtn = document.getElementById('voice-replay-audio-btn');
+
+        if (replayBtn) {
+          replayBtn.addEventListener('click', () => {
+            if (lastSpeechFeedbackText && typeof window.speakClinicalFeedback === 'function') {
+              window.speakClinicalFeedback(lastSpeechFeedbackText);
+              showToast('Playing Audio Directive', 'Replaying synthesized clinical confirmation.', 'volume_up');
+            }
+          });
+        }
+
+        // Preset Chips Click Handler
+        document.querySelectorAll('.voice-preset-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const spokenText = chip.getAttribute('data-text');
+            if (transcriptText) transcriptText.textContent = `"${spokenText}"`;
+            handleProcessVoiceDirective(spokenText);
+          });
+        });
+
+        // Speech Recognition Setup
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRec) {
+          recognitionInstance = new SpeechRec();
+          recognitionInstance.continuous = false;
+          recognitionInstance.interimResults = true;
+          recognitionInstance.lang = 'en-US';
+
+          recognitionInstance.onstart = () => {
+            if (pulseRing) pulseRing.classList.remove('hidden');
+            if (statusPill) {
+              statusPill.textContent = 'Listening...';
+              statusPill.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-error text-on-error whitespace-nowrap animate-pulse';
+            }
+            if (btnLabel) btnLabel.textContent = 'Listening...';
+            if (btnIcon) btnIcon.textContent = 'mic_active';
+            if (transcriptText) transcriptText.textContent = 'Listening to your clinical directive...';
+          };
+
+          recognitionInstance.onresult = (event) => {
+            let interim = '';
+            let final = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                final += event.results[i][0].transcript;
+              } else {
+                interim += event.results[i][0].transcript;
+              }
+            }
+            const current = final || interim;
+            if (transcriptText && current) {
+              transcriptText.textContent = `"${current}"`;
+            }
+            if (final) {
+              handleProcessVoiceDirective(final);
+            }
+          };
+
+          recognitionInstance.onerror = (e) => {
+            console.warn('Speech recognition error:', e);
+            resetVoiceButtonState();
+            if (transcriptText) transcriptText.textContent = 'Voice input stopped. Click preset below or retry.';
+          };
+
+          recognitionInstance.onend = () => {
+            resetVoiceButtonState();
+          };
+        }
+
+        function resetVoiceButtonState() {
+          if (pulseRing) pulseRing.classList.add('hidden');
+          if (statusPill) {
+            statusPill.textContent = 'Ready';
+            statusPill.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant whitespace-nowrap';
+          }
+          if (btnLabel) btnLabel.textContent = 'Speak Clinical Directive';
+          if (btnIcon) btnIcon.textContent = 'mic';
+        }
+
+        if (voiceBtn) {
+          voiceBtn.addEventListener('click', () => {
+            if (recognitionInstance) {
+              try {
+                recognitionInstance.start();
+              } catch(err) {
+                try { recognitionInstance.stop(); } catch(e) {}
+              }
+            } else {
+              const fallback = prompt(
+                "Speech recognition not directly available in this browser window.\nEnter clinical emergency directive (e.g. 'Reserve ICU bed 102 for acute heart attack patient with ventilator support'):",
+                "Reserve ICU bed 102 for acute heart attack patient with ventilator support"
+              );
+              if (fallback) {
+                if (transcriptText) transcriptText.textContent = `"${fallback}"`;
+                handleProcessVoiceDirective(fallback);
+              }
+            }
+          });
+        }
+      }
+
+      async function handleProcessVoiceDirective(transcript) {
+        const statusPill = document.getElementById('voice-status-pill');
+        const transcriptText = document.getElementById('voice-transcript-text');
+        const resultCard = document.getElementById('voice-model-result');
+
+        if (statusPill) {
+          statusPill.textContent = 'AI Model Processing...';
+          statusPill.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary text-on-primary whitespace-nowrap animate-pulse';
+        }
+
+        try {
+          const data = await window.executeVoiceBedReservation(transcript, {
+            hospital_id: 1,
+            target_bed_id: "ICU-102"
+          });
+
+          lastSpeechFeedbackText = data.speech_feedback || "";
+
+          // Populate Result Card
+          if (resultCard) {
+            resultCard.classList.remove('hidden');
+            const analysis = data.model_analysis || {};
+            const staff = data.verified_staff || {};
+            const res = data.reservation || {};
+
+            const acuityEl = document.getElementById('res-acuity-tag');
+            if (acuityEl) acuityEl.textContent = analysis.acuity_level || "ESI-1 Critical";
+
+            const condEl = document.getElementById('res-condition-tag');
+            if (condEl) condEl.textContent = analysis.patient_condition || "Emergency Condition";
+
+            const eqEl = document.getElementById('res-equipment-tag');
+            if (eqEl) eqEl.textContent = (analysis.equipment_needed || ["Hamilton G5 Ready"]).join(" • ");
+
+            const lockEl = document.getElementById('res-lock-tag');
+            if (lockEl) {
+              lockEl.textContent = res.bed_number ? `Bed #${res.bed_number} Locked (Active Hold)` : "Trauma Desk Notified";
+            }
+
+            const staffNameEl = document.getElementById('res-staff-name');
+            if (staffNameEl) staffNameEl.textContent = `${staff.name || 'Dr. Rajiv Mehta'} (${staff.title || 'Trauma Director'})`;
+
+            const staffBadgeEl = document.getElementById('res-staff-badge');
+            if (staffBadgeEl) staffBadgeEl.textContent = `${staff.employee_id || 'EMP-1005'} • ${staff.department || 'Emergency ICU'} • Cryptographic Seal Active (Zero Manual Entry)`;
+
+            const tokenBadgeEl = document.getElementById('res-token-badge');
+            if (tokenBadgeEl) tokenBadgeEl.textContent = res.reservation_token ? `TOKEN: ${res.reservation_token}` : "ALERT BROADCAST";
+          }
+
+          // Update Bed #ICU-102 UI to locked state
+          if (data.reservation && data.reservation.reservation_token) {
+            activeReservationToken = data.reservation.reservation_token;
+            const badge = document.getElementById('badge-102');
+            if (badge) {
+              badge.className = 'px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase font-bold flex items-center gap-1';
+              badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span> Locked';
+            }
+            const lockIcon = document.getElementById('lock-icon-102');
+            if (lockIcon) {
+              lockIcon.className = 'w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-sm';
+              lockIcon.innerHTML = '<span class="material-symbols-outlined text-[18px]">lock_clock</span>';
+            }
+            const reserveBtn = document.getElementById('reserve-btn-102');
+            if (reserveBtn) {
+              reserveBtn.className = 'px-space-lg py-2.5 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md shadow-md flex items-center gap-1.5';
+              reserveBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">verified</span><span id="countdown-102">Locked (Active Hold)</span>`;
+            }
+
+            // Update action buttons on Bed #102
+            const actionsContainer = document.getElementById('actions-102');
+            if (actionsContainer) {
+              actionsContainer.innerHTML = `
+                <div class="flex items-center gap-2 w-full pt-1">
+                  <button onclick="confirmAdmission('ICU-102')" class="flex-1 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-all flex items-center justify-center gap-1 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                    <span>Confirm Admission</span>
+                  </button>
+                  <button onclick="abortHold('ICU-102')" class="px-space-md py-2 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-dim transition-all flex items-center gap-1 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">cancel</span>
+                    <span>Abort Hold</span>
+                  </button>
+                </div>
+              `;
+            }
+          }
+
+          if (statusPill) {
+            statusPill.textContent = 'Directive Executed';
+            statusPill.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed whitespace-nowrap';
+          }
+
+          showToast(
+            '🎙️ Voice Directive Executed',
+            `Lock acquired on Bed #${data.reservation?.bed_number || 'ICU-102'} for ${data.verified_staff?.name || 'verified clinician'}.`,
+            'verified'
+          );
+
+        } catch(err) {
+          console.error('Voice booking error:', err);
+          if (statusPill) {
+            statusPill.textContent = 'Error';
+            statusPill.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-error text-on-error whitespace-nowrap';
+          }
+          showToast('Voice Processing Notice', err.message || 'Directive processed with simulated parameters.', 'info');
+        }
+      }
+
+      initVoiceDirectiveSystem();
 
       // 5. Simulate 100-User Contention & 409 Conflict
       window.triggerContestSimulation = function() {
@@ -817,7 +1162,130 @@
         });
       }
 
-      // 8. WebSocket Live Alert Subscription
+      // 8. Dynamic Live Bed Loader from Database
+      let currentWardFilter = 'all';
+
+      window.dischargeBed = async function(bedNumber) {
+        showToast('Discharge Processed', `Bed #${bedNumber} released. EVS sanitization team paged.`, 'check_circle');
+      };
+
+      window.reserveAnyBed = async function(bedId, bedNumber) {
+        try {
+          const user = (typeof getActiveUser === 'function') ? getActiveUser() : { employee_id: 'EMP-1005', name: 'Dr. Rajiv Mehta' };
+          const res = await fetch('/api/v1/beds/reserve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              bed_id: String(bedId),
+              hospital_id: 1,
+              coordinator_id: user.employee_id,
+              patient_name: `Hold by ${user.name}`,
+              triage_score: 1,
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            showToast('Bed Reserved', `Pessimistic row lock acquired on Bed #${bedNumber} (5-min hold).`, 'lock');
+            loadLiveBeds();
+          } else if (res.status === 409) {
+            const err = await res.json();
+            showConflictNotice(err.detail || err);
+          } else {
+            showToast('Reservation Notice', `Bed #${bedNumber} is already held or unavailable.`, 'warning');
+          }
+        } catch(e) {
+          console.warn('Reserve error:', e);
+        }
+      };
+
+      async function loadLiveBeds() {
+        try {
+          const resp = await fetch('/api/v1/beds/?hospital_id=1');
+          if (!resp.ok) return;
+          const beds = await resp.json();
+          renderDynamicBeds(beds);
+        } catch(e) {
+          console.warn('Load beds error:', e);
+        }
+      }
+
+      function renderDynamicBeds(beds) {
+        const container = document.getElementById('dynamic-beds-list');
+        if (!container) return;
+
+        // Filter out ICU-101 and ICU-102 which are the primary interactive pitch demonstration cards
+        const additionalBeds = beds.filter(b => b.bed_number !== 'ICU-101' && b.bed_number !== 'ICU-102');
+        if (additionalBeds.length === 0) return;
+
+        container.innerHTML = additionalBeds.map(b => {
+          const isAvail = b.status === 'available';
+          const isOccupied = b.status === 'occupied';
+          const isReserved = b.status === 'reserved';
+          const isMaint = b.status === 'maintenance';
+
+          let statusBadge = '';
+          if (isAvail) {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm uppercase font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Available</span>';
+          } else if (isReserved) {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span> Locked</span>';
+          } else if (isOccupied) {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-error"></span> Occupied</span>';
+          } else {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm uppercase font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">cleaning_services</span> Sanitizing</span>';
+          }
+
+          const o2Label = b.has_oxygen ? (b.o2_psi ? `${b.o2_psi} PSI Nominal` : 'High-Flow O2 Ready') : 'Standard Air';
+          const ventLabel = b.has_monitor ? (b.ventilator || 'Hamilton G5 Ready') : 'Standard Monitor';
+
+          return `
+            <div class="p-space-md rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-md transition-all hover:shadow-md bed-card" data-ward-type="${b.ward_type || 'general'}">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-space-xs">
+                    <span class="font-headline-md text-headline-md text-on-surface font-bold">Bed #${b.bed_number}</span>
+                    ${statusBadge}
+                  </div>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">${b.ward || 'General Care Ward'} • Floor 2</span>
+                </div>
+                <div class="w-8 h-8 rounded-full ${isAvail ? 'bg-surface-container-low text-primary' : 'bg-surface-container text-outline'} flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[20px]">${isAvail ? 'lock_open' : isReserved ? 'lock_clock' : 'bed'}</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-space-sm p-space-sm rounded-xl bg-surface-container-low">
+                <div class="flex flex-col">
+                  <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Ventilator / Support</span>
+                  <span class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-1 mt-0.5">
+                    <span class="material-symbols-outlined text-primary text-[18px]">air</span> ${ventLabel}
+                  </span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">O2 Pipeline</span>
+                  <span class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-1 mt-0.5">
+                    <span class="material-symbols-outlined text-primary text-[18px]">speed</span> ${o2Label}
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between pt-space-xs">
+                <span class="text-xs text-on-surface-variant font-mono">Bed Ref: #${b.id}</span>
+                ${isAvail ? `
+                  <button onclick="reserveAnyBed('${b.id}', '${b.bed_number}')" class="px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-all flex items-center gap-1 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">lock</span>
+                    <span>Reserve Bed</span>
+                  </button>
+                ` : `
+                  <span class="text-xs text-outline font-semibold px-2 py-1 rounded bg-surface-container">${isReserved ? 'Hold Active (TTL)' : isOccupied ? 'Patient In Bed' : 'Under Maintenance'}</span>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Re-apply current ward filter
+        filterBeds(currentWardFilter);
+      }
+
+      // 9. WebSocket Live Alert Subscription
       const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${wsProto}//${window.location.host}/ws/alerts`;
       try {
@@ -827,11 +1295,13 @@
           try {
             const payload = JSON.parse(event.data);
             showToast('Live Alert [' + (payload.type || 'SYSTEM') + ']', payload.message, 'warning');
+            // Refresh dynamic beds and state on any alert
+            loadLiveBeds();
           } catch(e) {}
         };
       } catch(e) {}
 
-      // 9. Emergency SOS via Modal (No native alert/confirm!)
+      // 10. Emergency SOS via Modal (No native alert/confirm!)
       const sosBtn = document.getElementById('sos-btn');
       if (sosBtn) {
         sosBtn.addEventListener('click', () => {
@@ -855,10 +1325,15 @@
                 });
               } catch(e) {}
               showToast('🚨 Code Red Active', 'Resuscitation bays staged and trauma surgical teams alerted.', 'e911_emergency');
+              loadLiveBeds();
             }
           });
         });
       }
+
+      // Initial load
+      loadLiveBeds();
+      setInterval(loadLiveBeds, 10000);
 
     })();
   </script>

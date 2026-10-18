@@ -21,7 +21,7 @@ def test_health_check():
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert "MediBook" in response.text or "Hospital Surge AI" in response.text
+    assert any(name in response.text for name in ("Iron-Gryph", "Hospital Surge AI", "MediBook"))
 
     # Verify JSON API info endpoint
     info_resp = client.get("/api/info")

@@ -1,0 +1,104 @@
+{
+  "incidents": [
+    {
+      "incident_id": "INC-001",
+      "incident_type": "road_accident",
+      "latitude": 12.975,
+      "longitude": 77.600,
+      "timestamp": "2026-10-17T18:10:00Z",
+      "severity": 4,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "heavy_rain"
+    },
+    {
+      "incident_id": "INC-002",
+      "incident_type": "road_accident",
+      "latitude": 12.978,
+      "longitude": 77.603,
+      "timestamp": "2026-10-17T18:45:00Z",
+      "severity": 3,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "heavy_rain"
+    },
+    {
+      "incident_id": "INC-003",
+      "incident_type": "public_gathering",
+      "latitude": 12.969,
+      "longitude": 77.590,
+      "timestamp": "2026-10-17T19:00:00Z",
+      "severity": 2,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "none"
+    },
+    {
+      "incident_id": "INC-004",
+      "incident_type": "storm_report",
+      "latitude": 13.120,
+      "longitude": 77.700,
+      "timestamp": "2026-10-17T18:30:00Z",
+      "severity": 4,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "storm"
+    },
+    {
+      "incident_id": "INC-005",
+      "incident_type": "fire",
+      "latitude": 12.960,
+      "longitude": 77.585,
+      "timestamp": "2026-10-17T17:30:00Z",
+      "severity": 5,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "none"
+    },
+    {
+      "incident_id": "INC-006",
+      "incident_type": "road_accident",
+      "latitude": 12.985,
+      "longitude": 77.610,
+      "timestamp": "2026-10-17T18:20:00Z",
+      "severity": 3,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "heavy_rain"
+    },
+    {
+      "incident_id": "INC-007",
+      "incident_type": "industrial_accident",
+      "latitude": 12.950,
+      "longitude": 77.560,
+      "timestamp": "2026-10-17T16:00:00Z",
+      "severity": 4,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "none"
+    },
+    {
+      "incident_id": "INC-008",
+      "incident_type": "flood_report",
+      "latitude": 12.972,
+      "longitude": 77.598,
+      "timestamp": "2026-10-17T19:15:00Z",
+      "severity": 3,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "flood"
+    },
+    {
+      "incident_id": "INC-009",
+      "incident_type": "road_accident",
+      "latitude": 13.200,
+      "longitude": 77.800,
+      "timestamp": "2026-10-17T20:00:00Z",
+      "severity": 2,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "none"
+    },
+    {
+      "incident_id": "INC-010",
+      "incident_type": "public_gathering",
+      "latitude": 12.971,
+      "longitude": 77.596,
+      "timestamp": "2026-10-17T19:30:00Z",
+      "severity": 2,
+      "data_source": "SIMULATED_DATASET",
+      "weather_condition": "heavy_rain"
+    }
+  ]
+}

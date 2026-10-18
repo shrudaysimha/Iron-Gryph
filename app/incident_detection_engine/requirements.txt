@@ -1,0 +1,21 @@
+# ── Core Framework ──
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# ── Data Processing ──
+pandas==2.2.3
+
+# ── Geospatial ──
+geopy==2.4.1
+
+# ── Validation & Settings ──
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# ── HTTP Client (for weather/event APIs) ──
+httpx==0.28.1
+
+# ── Testing ──
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx  # also used as async test client for FastAPI

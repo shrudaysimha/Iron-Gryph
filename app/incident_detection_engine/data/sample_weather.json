@@ -1,0 +1,62 @@
+[
+  {
+    "location_name": "Bengaluru Central",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "condition": "heavy_rain",
+    "temperature_celsius": 24.5,
+    "humidity_percent": 92,
+    "wind_speed_kmh": 35.0,
+    "timestamp": "2026-10-17T18:00:00Z",
+    "data_source": "SIMULATED",
+    "is_simulated": true
+  },
+  {
+    "location_name": "Koramangala",
+    "latitude": 12.9352,
+    "longitude": 77.6245,
+    "condition": "heavy_rain",
+    "temperature_celsius": 23.8,
+    "humidity_percent": 95,
+    "wind_speed_kmh": 40.2,
+    "timestamp": "2026-10-17T18:00:00Z",
+    "data_source": "SIMULATED",
+    "is_simulated": true
+  },
+  {
+    "location_name": "Whitefield",
+    "latitude": 12.9698,
+    "longitude": 77.7500,
+    "condition": "storm",
+    "temperature_celsius": 22.1,
+    "humidity_percent": 98,
+    "wind_speed_kmh": 65.0,
+    "timestamp": "2026-10-17T18:00:00Z",
+    "data_source": "SIMULATED",
+    "is_simulated": true
+  },
+  {
+    "location_name": "Jayanagar",
+    "latitude": 12.9250,
+    "longitude": 77.5938,
+    "condition": "none",
+    "temperature_celsius": 25.0,
+    "humidity_percent": 78,
+    "wind_speed_kmh": 12.0,
+    "timestamp": "2026-10-17T18:00:00Z",
+    "data_source": "SIMULATED",
+    "is_simulated": true
+  },
+  {
+    "location_name": "Yelahanka",
+    "latitude": 13.1007,
+    "longitude": 77.5963,
+    "condition": "extreme_heat",
+    "temperature_celsius": 43.5,
+    "humidity_percent": 30,
+    "wind_speed_kmh": 8.0,
+    "timestamp": "2026-10-17T14:00:00Z",
+    "data_source": "SIMULATED",
+    "is_simulated": true
+  }
+]

@@ -80,19 +80,38 @@ def evaluate_alerts(
     return new_alerts
 
 
+from fastapi import Request
+
+
 @router.post("/stat-callout")
 async def trigger_stat_callout(
+    request: Request,
     hospital_id: int = Query(default=1),
     message: str = Query(default="STAT Trauma Alert: Mass Casualty Inbound"),
     db: Session = Depends(get_db),
 ):
     """Trigger Code Red / Mass Casualty Protocol and broadcast to all connected WebSocket clients."""
+    # Attempt to extract from JSON body if present
+    title = "CODE RED: STAT TRAUMA CALLOUT"
+    severity = "critical"
+    alert_type = "mass_casualty"
+    try:
+        body = await request.json()
+        if isinstance(body, dict):
+            hospital_id = body.get("hospital_id", hospital_id)
+            message = body.get("message", message)
+            title = body.get("title", title)
+            severity = body.get("severity", severity)
+            alert_type = body.get("alert_type", alert_type)
+    except Exception:
+        pass
+
     from app.models.alert import Alert
     alert = Alert(
         hospital_id=hospital_id,
-        alert_type="mass_casualty",
-        severity="critical",
-        title="CODE RED: STAT TRAUMA CALLOUT",
+        alert_type=alert_type,
+        severity=severity,
+        title=title,
         message=message,
         acknowledged=False,
     )
@@ -109,7 +128,8 @@ async def trigger_stat_callout(
             "data": {
                 "alert_id": alert.id,
                 "hospital_id": hospital_id,
-                "severity": "critical",
+                "severity": severity,
+                "title": title,
             },
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }, hospital_id=hospital_id)
@@ -120,6 +140,7 @@ async def trigger_stat_callout(
         "success": True,
         "alert_id": alert.id,
         "type": "CODE_RED",
+        "title": title,
         "message": alert.message,
         "protocol": "Mass Casualty Protocol Activated",
         "timestamp": datetime.now(timezone.utc).isoformat(),

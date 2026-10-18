@@ -1,0 +1,64 @@
+{
+  "events": [
+    {
+      "event_id": "EVT-001",
+      "event_name": "IPL Cricket Match — RCB vs CSK",
+      "event_type": "sports",
+      "latitude": 12.9791,
+      "longitude": 77.5998,
+      "start_time": "2026-10-17T19:00:00Z",
+      "end_time": "2026-10-17T23:00:00Z",
+      "expected_attendance": 40000,
+      "data_source": "SIMULATED",
+      "is_simulated": true
+    },
+    {
+      "event_id": "EVT-002",
+      "event_name": "Bengaluru Tech Summit",
+      "event_type": "conference",
+      "latitude": 12.9563,
+      "longitude": 77.6015,
+      "start_time": "2026-10-17T09:00:00Z",
+      "end_time": "2026-10-17T18:00:00Z",
+      "expected_attendance": 5000,
+      "data_source": "SIMULATED",
+      "is_simulated": true
+    },
+    {
+      "event_id": "EVT-003",
+      "event_name": "Dussehra Celebration — Lalbagh",
+      "event_type": "festival",
+      "latitude": 12.9507,
+      "longitude": 77.5848,
+      "start_time": "2026-10-17T17:00:00Z",
+      "end_time": "2026-10-17T22:00:00Z",
+      "expected_attendance": 15000,
+      "data_source": "SIMULATED",
+      "is_simulated": true
+    },
+    {
+      "event_id": "EVT-004",
+      "event_name": "Music Concert — Palace Grounds",
+      "event_type": "concert",
+      "latitude": 13.0069,
+      "longitude": 77.5725,
+      "start_time": "2026-10-17T20:00:00Z",
+      "end_time": "2026-10-18T01:00:00Z",
+      "expected_attendance": 25000,
+      "data_source": "SIMULATED",
+      "is_simulated": true
+    },
+    {
+      "event_id": "EVT-005",
+      "event_name": "Marathon — Cubbon Park",
+      "event_type": "sports",
+      "latitude": 12.9763,
+      "longitude": 77.5929,
+      "start_time": "2026-10-18T05:30:00Z",
+      "end_time": "2026-10-18T10:00:00Z",
+      "expected_attendance": 8000,
+      "data_source": "SIMULATED",
+      "is_simulated": true
+    }
+  ]
+}

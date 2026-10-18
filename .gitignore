@@ -25,8 +25,9 @@ ENV/
 .env
 
 # ML Models (large files)
-app/ml/saved_models/*.pkl
-app/ml/saved_models/*.joblib
+*.pkl
+*.joblib
+*.joblib.*
 app/ml/saved_models/*.json
 !app/ml/saved_models/.gitkeep
 

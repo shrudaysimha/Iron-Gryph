@@ -11,17 +11,17 @@
       if (stored) return JSON.parse(stored);
     } catch (e) {}
 
-    // Default fallback profile if not yet explicitly selected
+    // Default fallback profile set to Patient per user requirement
     const fallback = {
-      employee_id: "EMP-1005",
-      name: "Dr. Rajiv Mehta",
-      role: "doctor",
-      title: "Chief Trauma Surgeon & Medical Director",
-      department: "Emergency Trauma & Surgical ICU",
-      specialization: "Trauma & Critical Care (DM, MD)",
-      shift: "morning",
+      employee_id: "PAT-88219",
+      name: "Arjun Sharma",
+      role: "patient",
+      title: "Patient • Cardiology OPD Token #B-24",
+      department: "Cardiology & General Inpatient Care",
+      specialization: "Active Patient Pass",
+      shift: "admitted",
       hospital: "SIDS Hospital Surat",
-      avatar_url: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80",
+      avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
     };
     localStorage.setItem('medibook_user', JSON.stringify(fallback));
     localStorage.setItem('medibook_token', 'MEDISESSION-DEFAULT-ACTIVE');
@@ -82,17 +82,17 @@
           <p id="drawer-title" class="font-body-sm text-xs text-primary font-semibold mt-0.5"></p>
           <span id="drawer-dept" class="text-xs text-on-surface-variant mt-1"></span>
 
-          <!-- Duty Pill -->
+          <!-- Duty / Patient Status Pill -->
           <div class="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed/30 text-on-primary-fixed-variant text-xs font-bold">
             <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-            <span>ON-DUTY SHIFT ACTIVE</span>
+            <span id="drawer-duty-pill">ACTIVE PATIENT PASS</span>
           </div>
         </div>
 
         <!-- Details Grid -->
         <div class="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-surface-container-low mb-4 text-left">
           <div>
-            <span class="text-[10px] uppercase font-bold text-on-surface-variant">Employee ID</span>
+            <span class="text-[10px] uppercase font-bold text-on-surface-variant">Patient / User ID</span>
             <span id="drawer-emp-id" class="block text-xs font-bold text-on-surface mt-0.5"></span>
           </div>
           <div>
@@ -103,6 +103,14 @@
 
         <!-- Action Buttons -->
         <div class="flex flex-col gap-2">
+          <a href="/dashboard" class="w-full py-2 rounded-xl bg-surface-container text-primary font-label-md text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-all">
+            <span class="material-symbols-outlined text-[16px]">speed</span>
+            <span>Master Command Center</span>
+          </a>
+          <a href="/legal-vault" class="w-full py-2 rounded-xl bg-indigo-950 text-indigo-300 font-label-md text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-indigo-900 transition-all border border-indigo-700/50">
+            <span class="material-symbols-outlined text-[16px]">gavel</span>
+            <span>Open Legal &amp; Evidence Vault</span>
+          </a>
           <a href="/login" class="w-full py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container transition-all">
             <span class="material-symbols-outlined text-[18px]">switch_account</span>
             <span>Switch Role / Doctor</span>
@@ -224,6 +232,59 @@
 
     dialog.classList.remove('hidden');
     dialog.classList.add('flex');
+  };
+
+  // 5. Voice-Enabled Bed Reservation & Hospital Contact Service
+  window.speakClinicalFeedback = function (text) {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+        if (preferred) utterance.voice = preferred;
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn('Speech synthesis unavailable:', e);
+      }
+    }
+  };
+
+  window.executeVoiceBedReservation = async function (transcript, options = {}) {
+    const user = getActiveUser();
+    const payload = {
+      audio_transcript: transcript,
+      hospital_id: options.hospital_id || 1,
+      staff_profile: {
+        employee_id: user.employee_id || "EMP-1005",
+        name: user.name || "Dr. Rajiv Mehta",
+        role: user.role || "doctor",
+        title: user.title || "Chief Trauma Surgeon & Medical Director",
+        department: user.department || "Emergency Trauma & Surgical ICU",
+        hospital: user.hospital || "SIDS Hospital Surat",
+        specialization: user.specialization || "Trauma & Critical Care",
+      },
+      target_bed_id: options.target_bed_id || null,
+    };
+
+    const res = await fetch('/api/v1/beds/voice-reserve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Voice reservation failed');
+    }
+
+    const data = await res.json();
+    if (data.speech_feedback) {
+      window.speakClinicalFeedback(data.speech_feedback);
+    }
+    return data;
   };
 
   // Run on load

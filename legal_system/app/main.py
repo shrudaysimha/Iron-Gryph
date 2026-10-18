@@ -60,6 +60,17 @@ app.include_router(cases.router, prefix=api_prefix)
 app.include_router(evidence.router, prefix=api_prefix)
 app.include_router(audit.router, prefix=api_prefix)
 
+# Mount Member 3 Surge Predictor routes
+try:
+    from legal_system.app.member3_backend_integration_pack.api_example import (
+        predict_surge as _member3_predict,
+        health as _member3_health,
+    )
+    app.add_api_route("/predict/surge", _member3_predict, methods=["POST"], tags=["Surge Predictor"])
+    app.add_api_route("/predict/surge/health", _member3_health, methods=["GET"], tags=["Surge Predictor"])
+except Exception as _exc:
+    logger.warning("Could not register member3 surge predictor routes: %s", _exc)
+
 
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
