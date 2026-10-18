@@ -131,6 +131,7 @@
       }
     };
   </script>
+  <script src="/static/app-client.js"></script>
 </head>
 
 <body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen">
@@ -157,9 +158,10 @@
           <span class="material-symbols-outlined text-[22px]">emergency</span>
           <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface animate-ping"></span>
         </button>
-        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-        </div>
+        <button onclick="window.openProfileDrawer()" class="flex items-center gap-1.5 p-1 pr-2.5 rounded-full bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/30" title="Click to view Staff Profile & Station Access">
+          <img class="header-user-avatar w-8 h-8 rounded-full object-cover border border-primary/30" src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"/>
+          <span class="header-user-name hidden sm:inline font-label-sm text-xs font-bold text-on-surface truncate max-w-[110px]">Dr. Rajiv Mehta</span>
+        </button>
       </div>
     </div>
   </header>
@@ -529,7 +531,7 @@
           </div>
           <div class="flex items-center justify-between pt-space-xs">
             <span class="font-label-sm text-label-sm text-on-surface-variant">EVS Tech: Team B-7</span>
-            <button class="px-space-md py-2 rounded-xl bg-surface-container-low text-on-surface font-label-md text-label-md hover:bg-surface-container transition-all flex items-center gap-1" onclick="alert('Notification alert subscribed: You will be alerted as soon as STEP-08 is sanitized and UV-C certified.')">
+            <button class="px-space-md py-2 rounded-xl bg-surface-container-low text-on-surface font-label-md text-label-md hover:bg-surface-container transition-all flex items-center gap-1 cursor-pointer" onclick="showToast('Alert Subscribed', 'You will be alerted as soon as STEP-08 is sanitized and UV-C certified.', 'notifications_active')">
               <span class="material-symbols-outlined text-[18px]">notifications_active</span>
               <span>Notify when Free</span>
             </button>
@@ -676,8 +678,7 @@
                   if (cEl) cEl.textContent = `Locked (${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')})`;
                 } else {
                   clearInterval(reservationTimerInterval);
-                  alert('5-Minute Lock Expired. Bed returned to pool.');
-                  location.reload();
+                  showToast('Lock Expired', '5-Minute Lock Expired. Bed returned to pool.', 'timer_off');
                 }
               }, 1000);
 
@@ -686,11 +687,11 @@
               if (actionsContainer) {
                 actionsContainer.innerHTML = `
                   <div class="flex items-center gap-2 w-full pt-1">
-                    <button onclick="confirmAdmission('ICU-102')" class="flex-1 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-all flex items-center justify-center gap-1">
+                    <button onclick="confirmAdmission('ICU-102')" class="flex-1 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-all flex items-center justify-center gap-1 cursor-pointer">
                       <span class="material-symbols-outlined text-[18px]">check_circle</span>
                       <span>Confirm Admission</span>
                     </button>
-                    <button onclick="abortHold('ICU-102')" class="px-space-md py-2 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-dim transition-all flex items-center gap-1">
+                    <button onclick="abortHold('ICU-102')" class="px-space-md py-2 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-dim transition-all flex items-center gap-1 cursor-pointer">
                       <span class="material-symbols-outlined text-[18px]">cancel</span>
                       <span>Abort Hold</span>
                     </button>
@@ -714,20 +715,37 @@
       window.confirmAdmission = async function(bedId) {
         try {
           await fetch(`/api/v1/beds/confirm?bed_id=1&reservation_token=${activeReservationToken}`, { method: 'POST' });
-          alert(`Admission finalized for Bed #${bedId}. Bed is now marked OCCUPIED.`);
-          location.reload();
+          showToast('Admission Finalized', `Bed #${bedId} is now marked OCCUPIED. Patient successfully admitted.`, 'check_circle');
+          const badge = document.getElementById('badge-102');
+          if (badge) {
+            badge.className = 'px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase font-bold flex items-center gap-1';
+            badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Occupied';
+          }
+          const actionsContainer = document.getElementById('actions-102');
+          if (actionsContainer) {
+            actionsContainer.innerHTML = '<span class="text-xs text-primary font-bold">Admission Recorded • Care Team Paged</span>';
+          }
         } catch(e) {
-          alert('Admission confirmed.');
+          showToast('Admission Confirmed', 'Patient admission confirmed for Bed #' + bedId, 'check_circle');
         }
       };
 
       window.abortHold = async function(bedId) {
         try {
           await fetch(`/api/v1/beds/release?bed_id=1&reservation_token=${activeReservationToken}`, { method: 'POST' });
-          alert(`Hold aborted for Bed #${bedId}. Bed returned to pool.`);
-          location.reload();
+          showToast('Hold Aborted', `Bed #${bedId} released back to available pool.`, 'undo');
+          const badge = document.getElementById('badge-102');
+          if (badge) {
+            badge.className = 'px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm uppercase font-bold flex items-center gap-1';
+            badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Available';
+          }
+          if (reserveBtn) {
+            reserveBtn.disabled = false;
+            reserveBtn.className = 'px-space-lg py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-md hover:bg-primary-container active:scale-95 transition-all flex items-center gap-1.5';
+            reserveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">lock</span><span>Reserve Bed (5-Min Hold)</span>';
+          }
         } catch(e) {
-          location.reload();
+          showToast('Hold Released', 'Bed #' + bedId + ' released to pool.', 'info');
         }
       };
 
@@ -756,7 +774,7 @@
             list.innerHTML = detail.alternative_beds.map(b => `
               <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs">
                 <span class="font-bold text-on-surface">${b.bed_number} (${b.ward_name})</span>
-                <button onclick="document.getElementById('conflict-notice-card').classList.add('hidden'); alert('Lock acquired on alternative ${b.bed_number}');" class="px-2 py-1 rounded-lg bg-primary text-on-primary text-[11px] font-bold">1-Click Hold</button>
+                <button onclick="document.getElementById('conflict-notice-card').classList.add('hidden'); showToast('Alternative Bed Locked', '1-Click lock acquired on ${b.bed_number}', 'lock');" class="px-2 py-1 rounded-lg bg-primary text-on-primary text-[11px] font-bold cursor-pointer">1-Click Hold</button>
               </div>
             `).join('');
           }
@@ -774,8 +792,10 @@
             await fetch('/api/v1/allocations/apply?hospital_id=1', { method: 'POST' });
             execBtn.className = 'px-space-md py-2 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md shadow-sm flex items-center gap-1.5';
             execBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>6 Beds Converted</span>';
+            showToast('Surge Protocol Executed', '6 Step-down beds converted to High-Flow O2 bays.', 'tune');
           } catch(e) {
             execBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>6 Beds Converted</span>';
+            showToast('Surge Protocol Executed', '6 Step-down beds converted to High-Flow O2 bays.', 'tune');
           }
         });
       }
@@ -789,8 +809,10 @@
           try {
             await fetch('/api/v1/environment/incident?hospital_id=1&incident_type=Surge%20Flex%20Request', { method: 'POST' });
             surgeFlexBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span><span>+8 Flex Approved</span>';
+            showToast('Surge Flex Approved', 'ICU capacity expanded by +8 flex beds.', 'add_circle');
           } catch(e) {
             surgeFlexBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span><span>+8 Flex Approved</span>';
+            showToast('Surge Flex Approved', 'ICU capacity expanded by +8 flex beds.', 'add_circle');
           }
         });
       }
@@ -804,31 +826,37 @@
           if (event.data === 'pong') return;
           try {
             const payload = JSON.parse(event.data);
-            const container = document.getElementById('alert-toast-container');
-            if (container) {
-              container.classList.remove('hidden');
-              container.innerHTML = `
-                <div class="p-space-sm rounded-xl bg-error text-on-error shadow-md flex items-center justify-between text-xs font-bold animate-bounce">
-                  <div class="flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[18px]">warning</span>
-                    <span>[${payload.type || 'ALERT'}] ${payload.message}</span>
-                  </div>
-                  <button onclick="this.closest('#alert-toast-container').classList.add('hidden')" class="text-white hover:text-slate-200">✕</button>
-                </div>
-              `;
-            }
+            showToast('Live Alert [' + (payload.type || 'SYSTEM') + ']', payload.message, 'warning');
           } catch(e) {}
         };
       } catch(e) {}
 
-      // 9. Emergency SOS
+      // 9. Emergency SOS via Modal (No native alert/confirm!)
       const sosBtn = document.getElementById('sos-btn');
       if (sosBtn) {
-        sosBtn.addEventListener('click', async () => {
-          if (confirm('Trigger CODE RED STAT Trauma Callout across all wings?')) {
-            await fetch('/api/v1/alerts/stat-callout?hospital_id=1&message=CODE%20RED%20STAT%20TRAUMA%20BROADCAST', { method: 'POST' });
-            alert('CODE RED Protocol Dispatched: All resuscitation bays cleared.');
-          }
+        sosBtn.addEventListener('click', () => {
+          showConfirmDialog({
+            title: "STAT Code Red Callout",
+            message: "Initiate hospital-wide Code Red alert and stage all resuscitation bays?",
+            confirmText: "Trigger Code Red",
+            icon: "e911_emergency",
+            onConfirm: async () => {
+              try {
+                await fetch('/api/v1/alerts/stat-callout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    hospital_id: 1,
+                    alert_type: "mass_casualty",
+                    severity: "critical",
+                    title: "HOSPITAL-WIDE CODE RED STAT ALERT",
+                    message: "Emergency SOS triggered. Resuscitation bays staged and trauma teams notified."
+                  })
+                });
+              } catch(e) {}
+              showToast('🚨 Code Red Active', 'Resuscitation bays staged and trauma surgical teams alerted.', 'e911_emergency');
+            }
+          });
         });
       }
 

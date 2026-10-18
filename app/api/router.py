@@ -2,10 +2,11 @@
 
 from fastapi import APIRouter
 
-from app.api.v1 import hospitals, patients, staff, ambulances, predictions, allocations, alerts, dashboard, environment, beds, opd
+from app.api.v1 import hospitals, patients, staff, ambulances, predictions, allocations, alerts, dashboard, environment, beds, opd, auth
 
 api_router = APIRouter(prefix="/api/v1")
 
+api_router.include_router(auth.router, prefix="/auth", tags=["Authentication & Staff Sessions"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 api_router.include_router(hospitals.router, prefix="/hospitals", tags=["Hospitals"])
 api_router.include_router(patients.router, prefix="/patients", tags=["Patients"])

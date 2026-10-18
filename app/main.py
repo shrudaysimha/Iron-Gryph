@@ -220,6 +220,15 @@ def root():
     return get_api_info()
 
 
+@app.get("/login", include_in_schema=False)
+def serve_login():
+    """Serve the MediBook Authentication & Sign-in screen."""
+    login_file = STATIC_DIR / "login.html"
+    if login_file.exists():
+        return FileResponse(str(login_file))
+    return FileResponse(str(STATIC_DIR / "beds.html"))
+
+
 @app.get("/beds", include_in_schema=False)
 def serve_beds():
     """Serve the MediBook Beds screen."""

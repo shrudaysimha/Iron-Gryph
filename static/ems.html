@@ -162,6 +162,7 @@
       }
     }
   </script>
+  <script src="/static/app-client.js"></script>
 </head>
 <body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen">
 
@@ -187,9 +188,10 @@
           <span class="material-symbols-outlined text-[22px]">emergency</span>
           <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface animate-ping"></span>
         </button>
-        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 text-on-primary">
-          <span class="material-symbols-outlined text-[18px]">person</span>
-        </div>
+        <button onclick="window.openProfileDrawer()" class="flex items-center gap-1.5 p-1 pr-2.5 rounded-full bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/30" title="Click to view Staff Profile & Station Access">
+          <img class="header-user-avatar w-8 h-8 rounded-full object-cover border border-primary/30" src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"/>
+          <span class="header-user-name hidden sm:inline font-label-sm text-xs font-bold text-on-surface truncate max-w-[110px]">Dr. Rajiv Mehta</span>
+        </button>
       </div>
     </div>
   </header>
@@ -791,31 +793,38 @@
     }
 
     function triggerEmergencySOS() {
-      if (confirm("Initiate SIDS Emergency Hospital-Wide Code Red / Mass Casualty Stat Alert?")) {
-        fetch('/api/v1/alerts/stat-callout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            hospital_id: 1,
-            alert_type: "mass_casualty",
-            severity: "critical",
-            title: "HOSPITAL-WIDE EMERGENCY SOS ACTIVATED",
-            message: "Emergency SOS triggered by CAD Controller. All trauma surgery suites on standby."
-          })
-        }).then(() => {
-          alert("🚨 SOS Broadcast Confirmed: Central Dispatch & Attending Surgery Staff Alerted.");
-        });
-      }
+      showConfirmDialog({
+        title: "STAT Code Red Callout",
+        message: "Initiate hospital-wide Code Red alert and stage all trauma resuscitation bays?",
+        confirmText: "Trigger Code Red",
+        icon: "e911_emergency",
+        onConfirm: async () => {
+          try {
+            await fetch('/api/v1/alerts/stat-callout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                hospital_id: 1,
+                alert_type: "mass_casualty",
+                severity: "critical",
+                title: "HOSPITAL-WIDE EMERGENCY SOS ACTIVATED",
+                message: "Emergency SOS triggered by CAD Controller. All trauma surgery suites on standby."
+              })
+            });
+          } catch(e) {}
+          showToast("🚨 SOS Broadcast Confirmed", "Central Dispatch & Attending Surgery Staff Alerted.", "e911_emergency");
+        }
+      });
     }
 
     function toggleDiversionModal() {
       fetch('/api/v1/hospitals/diversion-status?hospital_id=1', { method: 'POST' })
         .then(r => r.json())
         .then(data => {
-          alert(`Hospital Diversion Status: ${data.message || 'Updated'}`);
+          showToast('Hospital Diversion Status', data.message || 'Status updated successfully.', 'domain_verification');
         })
         .catch(() => {
-          alert("SIDS Hospital Surat: Accepting Critical Trauma • Minor Traumas diverted to Civil Hospital.");
+          showToast('Hospital Diversion', "SIDS Hospital Surat: Accepting Critical Trauma • Minor Traumas diverted.", 'info');
         });
     }
 

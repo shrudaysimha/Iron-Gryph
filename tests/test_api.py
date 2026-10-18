@@ -170,3 +170,32 @@ def test_bed_grid_and_reservation_flow():
     assert release_res.status_code == 200
     assert release_res.json()["status"] == "available"
 
+
+def test_auth_quick_profiles():
+    response = client.get("/api/v1/auth/quick-profiles")
+    assert response.status_code == 200
+    profiles = response.json()
+    assert len(profiles) >= 4
+    roles = [p["role"] for p in profiles]
+    assert "doctor" in roles
+    assert "nurse" in roles
+
+
+def test_auth_login():
+    response = client.post("/api/v1/auth/login", json={"identifier": "EMP-1005"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "token" in data
+    assert data["user"]["name"] == "Dr. Rajiv Mehta"
+    assert data["user"]["role"] == "doctor"
+
+
+def test_frontend_routes_served():
+    routes = ["/login", "/beds", "/triage", "/ems-live", "/doctors-rx"]
+    for route in routes:
+        resp = client.get(route)
+        assert resp.status_code == 200
+        assert "text/html" in resp.headers.get("content-type", "")
+
+
